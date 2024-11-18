@@ -42,7 +42,7 @@ for file in csv_files:
     df = pd.read_csv(file)
     
     # Add a new column 'year' with the extracted year
-    df['year'] = year
+    df['YEAR'] = year
     
     # Append the modified DataFrame to the list
     dataframes.append(df)
@@ -50,46 +50,140 @@ for file in csv_files:
 # Concatenate all DataFrames into one
 combined_df = pd.concat(dataframes, ignore_index=True)
 
+# Sort the combined DataFrame by 'GEO_ID' in descending order
 sorted_df = combined_df.sort_values(by='GEO_ID', ascending=False)
+```
 
+# Anayze meanings of variables
+Each year's dataset's variable has different interpretation, so it it critical to firstly select the most relevant variable for futher analysis. In our project, we only select total estimate to simplify our anlysis without considering gender and earning. For example, S1501_C01_015's definition has changed in 2018 from 'percent of bachelor degree or higher' to 'total population of bachelor degreee or higher.' Thus, we have to manually clean these messy variables.
+```{python}
+# Select the top 13 rows (containing each years variable definition) to analyze vairbales meaning
 top_13_rows = sorted_df.head(13)
 
-# Export the top 13 rows to a new Excel file to Analyze Which Variable to Use
-top_13_rows = top_13_rows.columns[
-    education.iloc[0].str.contains("Total!!Estimate!!", na=False) | 
-    education.iloc[0].str.contains("Geographic Area Name", na=False)
+# Identify columns where any cell contains "female", "male", or "margin"
+columns_to_drop = top_13_rows.columns[
+    top_13_rows.apply(lambda col: col.astype(str).str.contains(r"female|male|margin|nan|earning|race", case=False, na=False).any())
 ]
 
-top_13_rows
-export_path = '/Users/georgew/Desktop/Final Project/top_13_education_data_new.xlsx'
-top_13_rows.to_excel(export_path, index=False)
+# Drop the identified columns
+top_13_rows_f = top_13_rows.drop(columns=columns_to_drop)
+top_13_rows_f = top_13_rows_f.dropna(axis=1, how='all')
 ```
 
 # Select necessery variables
 ```{python}
-# List of variables to keep
-selected_columns = [
-    "GEO_ID", "NAME", "year",
-    "S1501_C01_001E", "S1501_C01_002E", "S1501_C01_003E",
-    "S1501_C01_012E", "S1501_C01_013E", "S1501_C01_014E", "S1501_C01_015E"
-]
+# Cleaning Education Attainment Data
+# Rename selected columns for better readability
+column_rename_map = {
+    "GEO_ID": "geo_id",  # Geographic identifier
+    "NAME": "area_name",  # Geographic area name
+    "YEAR": "year",  # Year of data
+    "S1501_C01_001E": "total_population",  # Total population
+    "S1501_C01_006E": "pop_25_plus",  # Population 25 years and over
+    "S1501_C01_007E": "pop_25_less_9th",  # 25 years and over: Less than 9th grade
+    "S1501_C01_009E": "pop_25_hs_grad",  # 25 years and over: High school graduate
+    "S1501_C01_013E": "pop_25_bach_plus",  # 25 years and over: Bachelor's degree or higher
+    "S1501_C01_017E": "pop_25_34",  # Population 25 to 34 years
+    "S1501_C01_019E": "pop_25_34_bach_plus",  # 25-34: Bachelor's degree or higher
+    "S1501_C01_021E": "pop_45_64_bach_plus"  # 45-64: Bachelor's degree or higher
+}
+
+# Create selected_columns based on column_rename_map keys
+selected_columns = list(column_rename_map.keys())
 
 # Filter the combined DataFrame to only keep the selected columns
 filtered_df = combined_df[selected_columns]
 
-# Display the first few rows of the filtered DataFrame
-print(filtered_df.head())
-```
+# Rename the columns
+filtered_df.rename(columns=column_rename_map, inplace=True)
 
-# Data Cleaning (Education)
-```{python}
-# Include columns that contain "Total!!Estimate!!" or are named "Geographic Area Name"
-columns_to_keep = education.columns[
-    education.iloc[0].str.contains("Total!!Estimate!!", na=False) | 
-    education.iloc[0].str.contains("Geographic Area Name", na=False)
+# Remove rows where GEO_ID equals "Geographic Area Name"
+edu_cleaned = filtered_df[filtered_df["geo_id"] != "Geographic Area Name"]
+
+# Save the cleaned data to a CSV file
+output_path = '/Users/georgew/Desktop/Final Project/edu_cleaned.csv'
+edu_cleaned.to_csv(output_path, index=False)
+
+print(f"Cleaned education data saved to {output_path}")
+
+# Cleaning Illegal Pets Data
+# List of columns to drop
+columns_to_drop = [
+    'Agency', 'Agency Name', 'Complaint Type', 'Cross Street 1', 'Cross Street 2',
+    'Intersection Street 1', 'Intersection Street 2', 'City', 'Landmark',
+    'Facility Type', 'Community Board', 'Park Facility Name', 'Vehicle Type',
+    'Taxi Company Borough', 'Taxi Pick Up Location', 'Bridge Highway Name',
+    'Bridge Highway Direction', 'Road Ramp', 'Bridge Highway Segment'
 ]
 
-# Filter the DataFrame to keep only these columns
-f_education = education[columns_to_keep]
+# Drop the specified columns
+illegal_pets = illegal_pets.drop(columns=columns_to_drop, errors='ignore')
+```
+
+# Standardization of County Name
+```{python}
+# Exam unqiue values in both dataframes for furthern merging
+print(edu_cleaned['area_name'].unique())
+
+# Create county name list in NYC
+nyc_counties = [
+    "New York County, New York",  # Manhattan
+    "Kings County, New York",     # Brooklyn
+    "Queens County, New York",    # Queens
+    "Bronx County, New York",     # The Bronx
+    "Richmond County, New York"   # Staten Island
+]
+
+# Select counties in NYC and filter them
+edu_nyc = edu_cleaned[edu_cleaned['area_name'].isin(nyc_counties)]
+
+# Mapping of county names to simplified borough names
+county_replacement_map = {
+    "New York County, New York": "New York",
+    "Kings County, New York": "Kings",
+    "Queens County, New York": "Queens",
+    "Bronx County, New York": "The Bronx",
+    "Richmond County, New York": "Staten Island"
+}
+
+# Replace county names in the 'name' column using the map
+edu_nyc['area_name'] = edu_nyc['area_name'].replace(county_replacement_map)
+
+# Exam unqiue values in both dataframes for furthern merging
+print(illegal_pets['Borough'].unique())
+
+# Mapping Borough
+borough_to_county = {
+    "BROOKLYN": "Kings",
+    "STATEN ISLAND": "Staten Island",
+    "QUEENS": "Queens",
+    "MANHATTAN": "New York",
+    "BRONX": "The Bronx"
+}
+
+# Map the 'Borough' column to new 'County' values
+illegal_pets['area_name'] = illegal_pets['Borough'].map(borough_to_county)
+
+print(illegal_pets['area_name'].unique())
+print(edu_nyc['area_name'].unique())
+```
+
+# Standardization Time Variable
+```{python}
+# Format both columns as strings
+illegal_pets['year'] = pd.to_datetime(illegal_pets['Created Date'], errors='coerce').dt.strftime('%Y')
+edu_nyc['year'] = pd.to_datetime(edu_nyc['year'], errors='coerce').dt.strftime('%Y')
 
 ```
+
+# Merging 
+```{python}
+# Drop 2023 and 2024 because education data does not includes these years
+illegal_pets = illegal_pets[~illegal_pets['year'].isin(['2023', '2024'])]
+
+# Merge based on year and area_name (County name)
+merged_df = pd.merge(illegal_pets, edu_nyc, on=['year', 'area_name'], how='left')
+print(merged_df.head())
+```
+
+# For final df name, please refer to 'merged_df'
