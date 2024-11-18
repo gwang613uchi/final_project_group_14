@@ -1,0 +1,95 @@
+---
+title: "Final Project (George Wang)"
+format: html
+---
+
+
+# Import Packages
+```{python}
+import pandas as pd
+import os
+```
+
+# Import Illegal Pets Data and Education Attainment Data in NYC
+```{python}
+# Illegal Pets Data
+illegal_pets = pd.read_csv("/Users/georgew/Desktop/Final Project/Illegal Pets/illegal_animals_kept_as_pets_20241116.csv")
+
+# Education Attainment Data
+education = pd.read_csv("/Users/georgew/Desktop/Final Project/Education Attainment/ACSST5Y2010.S1501-Data.csv")
+```
+
+# Combine all education data from 2010 to 2022
+```{python}
+import pandas as pd
+import os
+
+# Directory where all CSV files are stored
+directory = "/Users/georgew/Desktop/Final Project/Education Attainment"
+
+# Collect all file paths in the directory that match the naming pattern
+csv_files = [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith(".csv")]
+
+# List to hold individual DataFrames
+dataframes = []
+
+# Loop through each file, read it into a DataFrame, and append it to the list
+for file in csv_files:
+    # Extract the year from the file name (e.g., "ACSST5Y2010" -> "2010")
+    year = os.path.basename(file).split("ACSST5Y")[1][:4]
+    
+    # Read the CSV into a DataFrame
+    df = pd.read_csv(file)
+    
+    # Add a new column 'year' with the extracted year
+    df['year'] = year
+    
+    # Append the modified DataFrame to the list
+    dataframes.append(df)
+
+# Concatenate all DataFrames into one
+combined_df = pd.concat(dataframes, ignore_index=True)
+
+sorted_df = combined_df.sort_values(by='GEO_ID', ascending=False)
+
+top_13_rows = sorted_df.head(13)
+
+# Export the top 13 rows to a new Excel file to Analyze Which Variable to Use
+top_13_rows = top_13_rows.columns[
+    education.iloc[0].str.contains("Total!!Estimate!!", na=False) | 
+    education.iloc[0].str.contains("Geographic Area Name", na=False)
+]
+
+top_13_rows
+export_path = '/Users/georgew/Desktop/Final Project/top_13_education_data_new.xlsx'
+top_13_rows.to_excel(export_path, index=False)
+```
+
+# Select necessery variables
+```{python}
+# List of variables to keep
+selected_columns = [
+    "GEO_ID", "NAME", "year",
+    "S1501_C01_001E", "S1501_C01_002E", "S1501_C01_003E",
+    "S1501_C01_012E", "S1501_C01_013E", "S1501_C01_014E", "S1501_C01_015E"
+]
+
+# Filter the combined DataFrame to only keep the selected columns
+filtered_df = combined_df[selected_columns]
+
+# Display the first few rows of the filtered DataFrame
+print(filtered_df.head())
+```
+
+# Data Cleaning (Education)
+```{python}
+# Include columns that contain "Total!!Estimate!!" or are named "Geographic Area Name"
+columns_to_keep = education.columns[
+    education.iloc[0].str.contains("Total!!Estimate!!", na=False) | 
+    education.iloc[0].str.contains("Geographic Area Name", na=False)
+]
+
+# Filter the DataFrame to keep only these columns
+f_education = education[columns_to_keep]
+
+```
