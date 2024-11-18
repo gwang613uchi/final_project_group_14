@@ -8,6 +8,7 @@ format: html
 ```{python}
 import pandas as pd
 import os
+import geopandas as gpd
 ```
 
 # Import Illegal Pets Data and Education Attainment Data in NYC
@@ -186,4 +187,27 @@ merged_df = pd.merge(illegal_pets, edu_nyc, on=['year', 'area_name'], how='left'
 print(merged_df.head())
 ```
 
-# For final df name, please refer to 'merged_df'
+# Adding ZIP code
+```{python}
+# Load the shapefile
+shapefile_path = 'gz_2010_us_050_00_5m/gz_2010_us_050_00_5m.shp'
+gdf = gpd.read_file(shapefile_path)
+
+# List of GEO_IDs for NYC counties
+nyc_geo_ids = ["0500000US36005", "0500000US36047", "0500000US36061", "0500000US36081", "0500000US36085"]
+
+# Filter the GeoDataFrame
+nyc_gdf = gdf[gdf["GEO_ID"].isin(nyc_geo_ids)]
+
+# Display the result
+print(nyc_gdf)
+
+# Perform the merge
+nyc_gdf.rename(columns={"GEO_ID": "geo_id"}, inplace=True)
+result_gdf = nyc_gdf.merge(merged_df, on="geo_id", how="inner")
+
+# Display the merged GeoDataFrame
+print(result_gdf)
+```
+
+# For final df name (merging education attainment, illegal pets, and county shp data), please refer to 'result_gdf'
