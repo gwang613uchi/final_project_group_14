@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Final Project (George Wang)</title>
+<title>Final Project (Group 14)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -79,7 +79,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Final Project (George Wang)</h1>
+<h1 class="title">Final Project (Group 14)</h1>
 </div>
 
 
@@ -98,14 +98,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="import-packages" class="level1">
 <h1>Import Packages</h1>
-<div id="27d491db" class="cell" data-execution_count="1">
+<div id="0ef168c8" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="import-illegal-pets-data-and-education-attainment-data-in-nyc" class="level1">
 <h1>Import Illegal Pets Data and Education Attainment Data in NYC</h1>
-<div id="7548bd30" class="cell" data-execution_count="2">
+<div id="f1b9d6fd" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illegal Pets Data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>illegal_pets <span class="op">=</span> pd.read_csv(<span class="st">"Illegal Pets/illegal_animals_kept_as_pets_20241116.csv"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -115,7 +117,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="combine-all-education-data-from-2010-to-2022" class="level1">
 <h1>Combine all education data from 2010 to 2022</h1>
-<div id="8f4a6376" class="cell" data-execution_count="3">
+<div id="fdbdc7db" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -152,7 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="anayze-meanings-of-variables" class="level1">
 <h1>Anayze meanings of variables</h1>
 <p>Each year’s dataset’s variable has different interpretation, so it it critical to firstly select the most relevant variable for futher analysis. In our project, we only select total estimate to simplify our anlysis without considering gender and earning. For example, S1501_C01_015’s definition has changed in 2018 from ‘percent of bachelor degree or higher’ to ‘total population of bachelor degreee or higher.’ Thus, we have to manually clean these messy variables.</p>
-<div id="3ed8221e" class="cell" data-execution_count="4">
+<div id="ae41fc9e" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the top 13 rows (containing each years variable definition) to analyze vairbales meaning</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>top_13_rows <span class="op">=</span> sorted_df.head(<span class="dv">13</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -168,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="select-necessery-variables" class="level1">
 <h1>Select necessery variables</h1>
-<div id="54580901" class="cell" data-execution_count="5">
+<div id="6bdb41f7" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cleaning Education Attainment Data</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename selected columns for better readability</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>column_rename_map <span class="op">=</span> {</span>
@@ -219,7 +221,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Cleaned education data saved to edu_cleaned.csv</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_31766/2904843145.py:24: SettingWithCopyWarning:
+<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_36186/2904843145.py:24: SettingWithCopyWarning:
 
 
 A value is trying to be set on a copy of a slice from a DataFrame
@@ -231,7 +233,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="standardization-of-county-name" class="level1">
 <h1>Standardization of County Name</h1>
-<div id="7dba2f88" class="cell" data-execution_count="6">
+<div id="a1668c6c" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Exam unqiue values in both dataframes for furthern merging</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(edu_cleaned[<span class="st">'area_name'</span>].unique())</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -314,7 +316,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 ['The Bronx' 'Kings' 'New York' 'Queens' 'Staten Island']</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_31766/2301969997.py:26: SettingWithCopyWarning:
+<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_36186/2301969997.py:26: SettingWithCopyWarning:
 
 
 A value is trying to be set on a copy of a slice from a DataFrame.
@@ -327,16 +329,16 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="standardization-time-variable" class="level1">
 <h1>Standardization Time Variable</h1>
-<div id="2c92412c" class="cell" data-execution_count="7">
+<div id="73199aab" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Format both columns as strings</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>illegal_pets[<span class="st">'year'</span>] <span class="op">=</span> pd.to_datetime(illegal_pets[<span class="st">'Created Date'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>).dt.strftime(<span class="st">'%Y'</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>edu_nyc[<span class="st">'year'</span>] <span class="op">=</span> pd.to_datetime(edu_nyc[<span class="st">'year'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>).dt.strftime(<span class="st">'%Y'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_31766/3968184602.py:2: UserWarning:
+<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_36186/3968184602.py:2: UserWarning:
 
 Could not infer format, so each element will be parsed individually, falling back to `dateutil`. To ensure parsing is consistent and as-expected, please specify a format.
 
-/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_31766/3968184602.py:3: SettingWithCopyWarning:
+/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_36186/3968184602.py:3: SettingWithCopyWarning:
 
 
 A value is trying to be set on a copy of a slice from a DataFrame.
@@ -349,7 +351,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="merging" class="level1">
 <h1>Merging</h1>
-<div id="ee382b9b" class="cell" data-execution_count="8">
+<div id="2b1e0ad3" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop 2023 and 2024 because education data does not includes these years</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>illegal_pets <span class="op">=</span> illegal_pets[<span class="op">~</span>illegal_pets[<span class="st">'year'</span>].isin([<span class="st">'2023'</span>, <span class="st">'2024'</span>])]</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -396,8 +398,137 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </div>
 </div>
 </section>
-<section id="for-final-df-name-please-refer-to-merged_df" class="level1">
-<h1>For final df name, please refer to ‘merged_df’</h1>
+<section id="adding-zip-code" class="level1">
+<h1>Adding ZIP code</h1>
+<div id="3d00382a" class="cell" data-execution_count="9">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the shapefile</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>shapefile_path <span class="op">=</span> <span class="st">'gz_2010_us_050_00_5m/gz_2010_us_050_00_5m.shp'</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>gdf <span class="op">=</span> gpd.read_file(shapefile_path)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co"># List of GEO_IDs for NYC counties</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>nyc_geo_ids <span class="op">=</span> [<span class="st">"0500000US36005"</span>, <span class="st">"0500000US36047"</span>, <span class="st">"0500000US36061"</span>, <span class="st">"0500000US36081"</span>, <span class="st">"0500000US36085"</span>]</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter the GeoDataFrame</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>nyc_gdf <span class="op">=</span> gdf[gdf[<span class="st">"GEO_ID"</span>].isin(nyc_geo_ids)]</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the result</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(nyc_gdf)</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Perform the merge</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>nyc_gdf.rename(columns<span class="op">=</span>{<span class="st">"GEO_ID"</span>: <span class="st">"geo_id"</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>result_gdf <span class="op">=</span> nyc_gdf.merge(merged_df, on<span class="op">=</span><span class="st">"geo_id"</span>, how<span class="op">=</span><span class="st">"inner"</span>)</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Display the merged GeoDataFrame</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(result_gdf)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              GEO_ID STATE COUNTY      NAME    LSAD  CENSUSAREA  \
+2031  0500000US36005    36    005     Bronx  County      42.096   
+2089  0500000US36047    36    047     Kings  County      70.816   
+2094  0500000US36061    36    061  New York  County      22.829   
+2136  0500000US36081    36    081    Queens  County     108.532   
+2138  0500000US36085    36    085  Richmond  County      58.370   
+
+                                               geometry  
+2031  MULTIPOLYGON (((-73.77336 40.85945, -73.77055 ...  
+2089  POLYGON ((-73.9628 40.73767, -73.96119 40.7370...  
+2094  MULTIPOLYGON (((-74.04086 40.70012, -74.04002 ...  
+2136  POLYGON ((-73.89981 40.79252, -73.8922 40.7903...  
+2138  POLYGON ((-74.14443 40.53516, -74.1487 40.5344...  
+              geo_id STATE COUNTY      NAME    LSAD  CENSUSAREA  \
+0     0500000US36005    36    005     Bronx  County      42.096   
+1     0500000US36005    36    005     Bronx  County      42.096   
+2     0500000US36005    36    005     Bronx  County      42.096   
+3     0500000US36005    36    005     Bronx  County      42.096   
+4     0500000US36005    36    005     Bronx  County      42.096   
+...              ...   ...    ...       ...     ...         ...   
+3941  0500000US36085    36    085  Richmond  County      58.370   
+3942  0500000US36085    36    085  Richmond  County      58.370   
+3943  0500000US36085    36    085  Richmond  County      58.370   
+3944  0500000US36085    36    085  Richmond  County      58.370   
+3945  0500000US36085    36    085  Richmond  County      58.370   
+
+                                               geometry  Unique Key  \
+0     MULTIPOLYGON (((-73.77336 40.85945, -73.77055 ...    15715199   
+1     MULTIPOLYGON (((-73.77336 40.85945, -73.77055 ...    15723395   
+2     MULTIPOLYGON (((-73.77336 40.85945, -73.77055 ...    15730232   
+3     MULTIPOLYGON (((-73.77336 40.85945, -73.77055 ...    15752480   
+4     MULTIPOLYGON (((-73.77336 40.85945, -73.77055 ...    16146221   
+...                                                 ...         ...   
+3941  POLYGON ((-74.14443 40.53516, -74.1487 40.5344...    55745721   
+3942  POLYGON ((-74.14443 40.53516, -74.1487 40.5344...    55786317   
+3943  POLYGON ((-74.14443 40.53516, -74.1487 40.5344...    55873108   
+3944  POLYGON ((-74.14443 40.53516, -74.1487 40.5344...    55931798   
+3945  POLYGON ((-74.14443 40.53516, -74.1487 40.5344...    56253746   
+
+                Created Date             Closed Date  ...      area_name  \
+0     01/12/2010 08:20:26 PM  01/13/2010 10:01:25 AM  ...      The Bronx   
+1     01/13/2010 10:50:37 AM  02/01/2010 11:03:50 AM  ...      The Bronx   
+2     01/14/2010 08:56:56 AM  02/01/2010 01:47:06 PM  ...      The Bronx   
+3     01/18/2010 11:37:00 AM  02/03/2010 01:34:20 PM  ...      The Bronx   
+4     03/05/2010 01:27:05 PM  03/05/2010 02:08:50 PM  ...      The Bronx   
+...                      ...                     ...  ...            ...   
+3941  10/19/2022 11:48:57 AM  10/19/2022 11:48:57 AM  ...  Staten Island   
+3942  10/23/2022 09:11:48 AM  10/23/2022 09:11:48 AM  ...  Staten Island   
+3943  11/02/2022 02:01:19 PM  11/02/2022 02:01:19 PM  ...  Staten Island   
+3944  11/08/2022 12:46:40 PM                     NaN  ...  Staten Island   
+3945  12/14/2022 07:31:19 AM  12/14/2022 07:31:19 AM  ...  Staten Island   
+
+      year  total_population pop_25_plus pop_25_less_9th pop_25_hs_grad  \
+0     2010            153214      840009            15.3           28.3   
+1     2010            153214      840009            15.3           28.3   
+2     2010            153214      840009            15.3           28.3   
+3     2010            153214      840009            15.3           28.3   
+4     2010            153214      840009            15.3           28.3   
+...    ...               ...         ...             ...            ...   
+3941  2022             41539      344639           17969         102409   
+3942  2022             41539      344639           17969         102409   
+3943  2022             41539      344639           17969         102409   
+3944  2022             41539      344639           17969         102409   
+3945  2022             41539      344639           17969         102409   
+
+     pop_25_bach_plus pop_25_34 pop_25_34_bach_plus pop_45_64_bach_plus  
+0                 6.5      76.0              191951                18.8  
+1                 6.5      76.0              191951                18.8  
+2                 6.5      76.0              191951                18.8  
+3                 6.5      76.0              191951                18.8  
+4                 6.5      76.0              191951                18.8  
+...               ...       ...                 ...                 ...  
+3941            48927     60975               62109               27760  
+3942            48927     60975               62109               27760  
+3943            48927     60975               62109               27760  
+3944            48927     60975               62109               27760  
+3945            48927     60975               62109               27760  
+
+[3946 rows x 37 columns]</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_36186/1499606736.py:15: SettingWithCopyWarning:
+
+
+A value is trying to be set on a copy of a slice from a DataFrame
+
+See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy
+</code></pre>
+</div>
+</div>
+</section>
+<section id="for-final-df-name-merging-education-attainment-illegal-pets-and-county-shp-data-please-refer-to-result_gdf" class="level1">
+<h1>For final df name (merging education attainment, illegal pets, and county shp data), please refer to ‘result_gdf’</h1>
+<div id="96684be0" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plotting the GeoDataFrame</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>gdf.plot(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>), edgecolor<span class="op">=</span><span class="st">"black"</span>, cmap<span class="op">=</span><span class="st">"viridis"</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">"Geospatial Data Visualization"</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"Longitude"</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">"Latitude"</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="final_project_files/figure-html/cell-11-output-1.png" width="808" height="236" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
 </section>
 
 </main>

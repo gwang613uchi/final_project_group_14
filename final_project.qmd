@@ -9,6 +9,7 @@ format: html
 import pandas as pd
 import os
 import geopandas as gpd
+import matplotlib.pyplot as plt
 ```
 
 # Import Illegal Pets Data and Education Attainment Data in NYC
@@ -211,3 +212,23 @@ print(result_gdf)
 ```
 
 # For final df name (merging education attainment, illegal pets, and county shp data), please refer to 'result_gdf'
+
+# Example of a 
+```{python}
+# Ensure the column is numeric and convert to integers
+result_gdf['pop_25_bach_plus'] = result_gdf['pop_25_bach_plus'].astype(float)
+
+result_gdf.plot(
+    column='pop_25_bach_plus',  # 25 years and over: Bachelor's degree or higher
+    cmap='viridis',            # Colormap (adjust as needed)
+    legend=True,               # Show legend
+    figsize=(10, 10),          # Set figure size
+    edgecolor='black'          # Add borders to polygons
+)
+
+# Adding a title and axis labels
+plt.title("Population with Bachelor's Degree or Higher (25+)")
+plt.xlabel("Longitude")
+plt.ylabel("Latitude")
+plt.show()
+```
