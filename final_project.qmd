@@ -39,11 +39,7 @@ dataframes = []
 for file in csv_files:
     # Extract the year from the file name (e.g., "ACSST5Y2010" -> "2010")
     year = os.path.basename(file).split("ACSST5Y")[1][:4]
-    
-    # Read the CSV into a DataFrame
     df = pd.read_csv(file)
-    
-    # Add a new column 'year' with the extracted year
     df['YEAR'] = year
     
     # Append the modified DataFrame to the list
@@ -85,7 +81,6 @@ column_rename_map = {
     "S1501_C01_007E": "pop_25_less_9th",  # 25 years and over: Less than 9th grade
     "S1501_C01_009E": "pop_25_hs_grad",  # 25 years and over: High school graduate
     "S1501_C01_013E": "pop_25_bach_plus",  # 25 years and over: Bachelor's degree or higher
-    "S1501_C01_017E": "pop_25_34",  # Population 25 to 34 years
     "S1501_C01_019E": "pop_25_34_bach_plus",  # 25-34: Bachelor's degree or higher
     "S1501_C01_021E": "pop_45_64_bach_plus"  # 45-64: Bachelor's degree or higher
 }
@@ -102,11 +97,10 @@ filtered_df.rename(columns=column_rename_map, inplace=True)
 # Remove rows where GEO_ID equals "Geographic Area Name"
 edu_cleaned = filtered_df[filtered_df["geo_id"] != "Geographic Area Name"]
 
-# Save the cleaned data to a CSV file
-output_path = 'edu_cleaned.csv'
-edu_cleaned.to_csv(output_path, index=False)
-
-print(f"Cleaned education data saved to {output_path}")
+# Adjust variables to accommodate different years' approaches to estimate (volume or percentage)
+# Transform year 2010 to year 2014's 'pop_25_less_9th' variable to be the result between 'pop_25_less_9th' and 'pop_25_plus'
+for year in range(2010, 2015):
+    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_less_9th'] = pd.to_numeric(edu_cleaned['pop_25_less_9th'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce')
 
 # Cleaning Illegal Pets Data
 # List of columns to drop
@@ -175,7 +169,6 @@ print(edu_nyc['area_name'].unique())
 # Format both columns as strings
 illegal_pets['year'] = pd.to_datetime(illegal_pets['Created Date'], errors='coerce').dt.strftime('%Y')
 edu_nyc['year'] = pd.to_datetime(edu_nyc['year'], errors='coerce').dt.strftime('%Y')
-
 ```
 
 # Merging 
@@ -186,6 +179,9 @@ illegal_pets = illegal_pets[~illegal_pets['year'].isin(['2023', '2024'])]
 # Merge based on year and area_name (County name)
 merged_df = pd.merge(illegal_pets, edu_nyc, on=['year', 'area_name'], how='left')
 print(merged_df.head())
+
+# Save the merged DataFrame to a CSV file
+merged_df.to_csv("final_education_illegal_pets.csv", index=False)
 ```
 
 # Adding ZIP code
@@ -209,11 +205,12 @@ result_gdf = nyc_gdf.merge(merged_df, on="geo_id", how="inner")
 
 # Display the merged GeoDataFrame
 print(result_gdf)
+print(merged_df)
 ```
 
 # For final df name (merging education attainment, illegal pets, and county shp data), please refer to 'result_gdf'
 
-# Example of a 
+# Example
 ```{python}
 # Ensure the column is numeric and convert to integers
 result_gdf['pop_25_bach_plus'] = result_gdf['pop_25_bach_plus'].astype(float)
