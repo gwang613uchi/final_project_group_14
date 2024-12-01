@@ -312,7 +312,7 @@ plt.show()
 
 # 4. Line Plot: Different education level over time
 ```{python}
-merged_df = pd.read_csv("/content/final_education_illegal_pets.csv")
+merged_df = pd.read_csv("final_education_illegal_pets.csv")
 
 import altair as alt
 
@@ -446,45 +446,47 @@ X = sm.add_constant(X)
 model = sm.OLS(y, X).fit()
 print(model.summary())
 
-# Visualize the relationship for each education level
+import altair as alt
+import pandas as pd
+
+# Use Altair to create regression plots for each feature
 for feature, label in zip(
     ['pop_25_less_9th_%', 'pop_25_hs_grad_%', 'pop_25_bach_plus_%'],
     ["% Population with Less than 9th Grade Education",
      "% Population with High School Graduation",
      "% Population with Bachelor's Degree or Higher"]
 ):
-    plt.figure(figsize=(10, 6))
-
-    # Create scatter plot with regression line
-    sns.regplot(
-        x=district_data[feature],
-        y=district_data['Incident_Percentage(%)'],
-        ci=None,
-        scatter_kws={"s": 50},
-        line_kws={"color": "red"},
+    # Create Altair chart
+    chart = alt.Chart(district_data).mark_point(filled=True, size=100).encode(
+        x=alt.X(f'{feature}:Q', title=label),
+        y=alt.Y('Incident_Percentage(%):Q', title="Illegal Pet Incident Percentage (%)"),
+        tooltip=['Borough', alt.Tooltip(f'{feature}:Q', title=label), alt.Tooltip('Incident_Percentage(%):Q', title='Incident %')]
+    ).properties(
+        title=f"Regression: Illegal Pet Incident Percentage vs. {label}",
+        width=800,
+        height=400
     )
 
-    # Add district names to each point
-    for i in range(len(district_data)):
-        plt.text(
-            x=district_data[feature].iloc[i],
-            y=district_data['Incident_Percentage(%)'].iloc[i],
-            s=district_data['Borough'].iloc[i],
-            fontsize=10,
-            color="blue",
-            ha="right"
-        )
+    # Add regression line
+    regression_line = chart.transform_regression(
+        f'{feature}', 'Incident_Percentage(%)'
+    ).mark_line(color='red')
 
-    # Add title and labels
-    plt.title(f"Regression: Illegal Pet Incident Percentage vs. {label}", fontsize=16)
-    plt.xlabel(label, fontsize=12)
-    plt.ylabel("Illegal Pet Incident Percentage (%)", fontsize=12)
-    plt.tight_layout()
-    plt.show()
+    # Combine scatter plot and regression line
+    combined_chart = chart + regression_line
+
+    # Display the chart directly (no `.show()`)
+    display(combined_chart.configure_title(
+        fontSize=16,
+        anchor='middle'
+    ).configure_axis(
+        labelFontSize=12,
+        titleFontSize=14
+    ))
 ```
 
 # Why Use This Method
-This method normalizes incident counts by population size, allowing fair comparisons across boroughs. Regression analysis helps identify relationships between education levels and incident rates, while visualization makes these patterns clear.
+This method normalizes incident counts by population size, allowing fair comparisons across boroughs. Regression analysis helps identify relationships between education levels as percentages and incident rates, while visualization makes these patterns clear.
 
 By normalizing incident counts per 10,000 people, the method ensures fair comparisons across boroughs with different population sizes. Regression analysis quantifies the relationship between education levels and incident rates, providing insights into potential trends. Visualizations, such as scatter plots, make these relationships clear and accessible, helping to identify patterns and inform decision-making.
 
