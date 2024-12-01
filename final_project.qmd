@@ -10,6 +10,10 @@ import pandas as pd
 import os
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import seaborn as sns
+import folium
+from folium.plugins import HeatMap
+import altair as alt
 ```
 
 # Import Illegal Pets Data and Education Attainment Data in NYC
@@ -69,6 +73,8 @@ top_13_rows_f = top_13_rows_f.dropna(axis=1, how='all')
 ```
 
 # Select necessery variables
+We focus on educational attainment for individuals aged 25 and over, which is a common demographic for analyzing educational outcomes. By age 25, most individuals have completed their formal education, making it a relevant age group for assessing educational attainment.
+
 ```{python}
 # Cleaning Education Attainment Data
 # Rename selected columns for better readability
@@ -185,48 +191,308 @@ print(merged_df.head())
 merged_df.to_csv("final_education_illegal_pets.csv", index=False)
 ```
 
-# Adding ZIP code
+# For final df name (merging education attainment, illegal pets), please refer to 'merged_df'
+
+# Load Map Data, drop NA and convert data type
 ```{python}
-# Load the shapefile
-shapefile_path = 'gz_2010_us_050_00_5m/gz_2010_us_050_00_5m.shp'
-gdf = gpd.read_file(shapefile_path)
+# Load the GeoJSON file
+geojson_path = '/Users/kohanchen/Documents/Fall 2024/student30538/problem_sets/final_project/final_project_group_14/Map_data/nyc-zips.geojson'
+nyc_zips = gpd.read_file(geojson_path)
+merged_df = pd.read_csv("/Users/kohanchen/Documents/Fall 2024/student30538/problem_sets/final_project/final_project_group_14/final_education_illegal_pets.csv")
 
-# List of GEO_IDs for NYC counties
-nyc_geo_ids = ["0500000US36005", "0500000US36047", "0500000US36061", "0500000US36081", "0500000US36085"]
+# Drop rows with NaN ZIP codes or fill them with a placeholder
+merged_df = merged_df.dropna(subset=['Incident Zip'])
 
-# Filter the GeoDataFrame
-nyc_gdf = gdf[gdf["GEO_ID"].isin(nyc_geo_ids)]
+# Convert ZIP codes to strings without decimals
+merged_df['Incident Zip'] = merged_df['Incident Zip'].apply(lambda x: str(int(x)))
 
-# Display the result
-print(nyc_gdf)
+# Ensure both columns are strings
+nyc_zips['postalCode'] = nyc_zips['postalCode'].astype(str)
 
-# Perform the merge
-nyc_gdf.rename(columns={"GEO_ID": "geo_id"}, inplace=True)
-result_gdf = nyc_gdf.merge(merged_df, on="geo_id", how="inner")
-
-# Display the merged GeoDataFrame
-print(result_gdf)
-print(merged_df)
 ```
 
-# For final df name (merging education attainment, illegal pets, and county shp data), please refer to 'result_gdf'
+Final Project Visualization
 
-# Example
+# 1. Bar chart: types of illegal pets in NYC
 ```{python}
-# Ensure the column is numeric and convert to integers
-result_gdf['pop_25_bach_plus'] = result_gdf['pop_25_bach_plus'].astype(float)
 
-result_gdf.plot(
-    column='pop_25_bach_plus',  # 25 years and over: Bachelor's degree or higher
-    cmap='viridis',            # Colormap (adjust as needed)
-    legend=True,               # Show legend
-    figsize=(10, 10),          # Set figure size
-    edgecolor='black'          # Add borders to polygons
+# 1. Bar chart of types of illegal pets
+
+chart = alt.Chart(merged_df).mark_bar().encode(
+    y=alt.Y('Descriptor:N', 
+            sort='-x',  # Sort by count in descending order
+            title='Pet Type'),
+    x=alt.X('count():Q',
+            title='Number of Incidents'),
+    tooltip=['Descriptor', alt.Tooltip('count():Q', title='Count')]
+).properties(
+    title='Types of Illegal Pets in NYC',
+    width=600,
+    height=400
+).configure_axis(
+    labelFontSize=12,
+    titleFontSize=14
+).configure_title(
+    fontSize=16,
+    anchor='middle'
 )
 
-# Adding a title and axis labels
-plt.title("Population with Bachelor's Degree or Higher (25+)")
-plt.xlabel("Longitude")
-plt.ylabel("Latitude")
+chart
+```
+
+# 2. Pie chart of incidents across boroughs
+```{python}
+# Calculate percentages and create pie chart with labels
+total = len(merged_df)
+df_with_pct = merged_df.assign(
+    percentage=lambda x: (x.groupby('area_name')['area_name'].transform('count') / total * 100).round(1)
+)
+
+# Create a summary dataframe for the text labels
+summary_df = (df_with_pct.groupby('area_name')
+             .agg(count=('area_name', 'count'),
+                  percentage=('percentage', 'first'))
+             .reset_index()
+             .assign(label=lambda x: x['area_name'] + ': ' + x['percentage'].astype(str) + '%'))
+
+# Create pie chart with percentages
+chart = alt.Chart(df_with_pct).mark_arc(outerRadius=180).encode(
+    theta='count():Q',
+    color=alt.Color('area_name:N', 
+                   scale=alt.Scale(scheme='tableau10'),
+                   legend=alt.Legend(title="Borough")),
+    tooltip=['area_name:N', 
+            alt.Tooltip('count():Q', title='Count'),
+            alt.Tooltip('percentage:Q', title='Percentage', format='.1f')]
+).properties(
+    title={
+        'text': 'Distribution of Illegal Pet Incidents by Borough',
+        'fontSize': 16,
+        'anchor': 'middle'
+    },
+    width=400,
+    height=400
+)
+
+# Add text labels with percentages
+text = alt.Chart(summary_df).mark_text(radius=120, size=11).encode(
+    theta=alt.Theta('count:Q', stack=True),
+    text='label:N'
+)
+
+# Combine chart and labels
+final_chart = (chart + text).configure_view(
+    strokeWidth=0
+)
+
+final_chart
+```
+
+# 3. Choropleth Map
+```{python}
+# Count complaints by ZIP code
+pet_counts = merged_df.groupby('Incident Zip').size().reset_index(name='complaints_count')
+
+# Merge counts with GeoDataFrame
+nyc_zips = nyc_zips.merge(pet_counts, left_on='postalCode', right_on='Incident Zip', how='left')
+
+# Fill NaN values with 0 for ZIP codes with no complaints
+nyc_zips['complaints_count'] = nyc_zips['complaints_count'].fillna(0)
+
+# Plotting the choropleth map
+fig, ax = plt.subplots(1, 1, figsize=(12, 8))
+nyc_zips.plot(column='complaints_count', ax=ax, legend=True,
+              cmap='OrRd',  # Color map for density
+              legend_kwds={'label': "Number of Illegal Pet Complaints by ZIP",
+                           'orientation': "vertical",
+                           'shrink': 0.6})  # Adjust legend size
+ax.set_title('Choropleth Map of Illegal Pet Complaints in NYC by ZIP Code')
+plt.axis('off')  # Turn off the axis
 plt.show()
 ```
+
+# 4. Line Plot: Different education level over time
+```{python}
+merged_df = pd.read_csv("/Users/kohanchen/Documents/Fall 2024/student30538/problem_sets/final_project/final_project_group_14/final_education_illegal_pets.csv")
+
+import altair as alt
+
+# Prepare the data (keeping the same data preparation steps)
+education_levels_over_time = merged_df.groupby('year')[
+    ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus']
+].mean().reset_index()
+
+education_levels_long = education_levels_over_time.melt(
+    id_vars='year',
+    value_vars=['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus'],
+    var_name='Education Level',
+    value_name='Population'
+)
+
+education_level_mapping = {
+    'pop_25_less_9th': 'Less than 9th Grade',
+    'pop_25_hs_grad': 'High School Graduate',
+    'pop_25_bach_plus': 'Bachelor\'s Degree or Higher'
+}
+education_levels_long['Education Level'] = education_levels_long['Education Level'].map(education_level_mapping)
+
+# Create the line chart using Altair
+chart = alt.Chart(education_levels_long).mark_line(point=True).encode(
+    x=alt.X('year:O', title='Year'),
+    y=alt.Y('Population:Q', title='Average Population'),
+    color=alt.Color('Education Level:N', title='Education Level'),
+    tooltip=['year', 'Education Level', alt.Tooltip('Population:Q', format=',')]
+).properties(
+    title='Different Education Levels Over Time',
+    width=800,
+    height=400
+).configure_axis(
+    labelFontSize=12,
+    titleFontSize=14
+).configure_title(
+    fontSize=16
+)
+
+chart
+```
+
+# 5. Correlation Analysis
+
+```{python}
+import requests
+import geopandas as gpd
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+import seaborn as sns
+import folium
+
+# 2. Aggregate Data
+# Count illegal pet incidents by district
+incident_counts = merged_df.groupby('Borough')['Descriptor'].count().reset_index()
+incident_counts.rename(columns={'Descriptor': 'Illegal_Pet_Incidents'}, inplace=True)
+
+# Calculate mean education levels by district
+education_data = merged_df.groupby('Borough')[
+    ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus', 'total_population']
+].mean().reset_index()
+
+# Merge datasets
+district_data = pd.merge(incident_counts, education_data, on='Borough')
+
+# Calculate incident percentage
+district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['total_population']) * 100
+
+
+# 3. Perform Regression: Using all education levels as predictors
+X = district_data[['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus']]
+y = district_data['Incident_Percentage(%)']
+
+# Add a constant to the model (for the intercept)
+X = sm.add_constant(X)
+
+# Fit the regression model
+model = sm.OLS(y, X).fit()
+print(model.summary())
+
+# Visualize the relationship for each education level
+for feature, label in zip(
+    ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus'],
+    ["Population 25+ with Less than 9th Grade Education (in 1000)",
+     "Population 25+ with High School Graduation (in 1000)",
+     "Population 25+ with Bachelor's Degree or Higher (in 1000)"]
+):
+    plt.figure(figsize=(10, 6))
+
+    # Create scatter plot with regression line
+    sns.regplot(
+        x=district_data[feature] / 1000,
+        y=district_data['Incident_Percentage(%)'],
+        ci=None,
+        scatter_kws={"s": 50},
+        line_kws={"color": "red"},
+    )
+
+    # Add district names to each point
+    for i in range(len(district_data)):
+        plt.text(
+            x=district_data[feature].iloc[i] / 1000,
+            y=district_data['Incident_Percentage(%)'].iloc[i],
+            s=district_data['Borough'].iloc[i],
+            fontsize=10,
+            color="blue",
+            ha="right"
+        )
+
+    # Add title and labels
+    plt.title(f"Regression: Illegal Pet Incident Percentage vs. {label}", fontsize=16)
+    plt.xlabel(label, fontsize=12)
+    plt.ylabel("Illegal Pet Incident Percentage(%)", fontsize=12)
+    plt.tight_layout()
+    plt.show()
+```
+
+# Why Use This Method
+This method normalizes incident counts by population size, allowing fair comparisons across boroughs. Regression analysis helps identify relationships between education levels and incident rates, while visualization makes these patterns clear.
+
+By normalizing incident counts per 10,000 people, the method ensures fair comparisons across boroughs with different population sizes. Regression analysis quantifies the relationship between education levels and incident rates, providing insights into potential trends. Visualizations, such as scatter plots, make these relationships clear and accessible, helping to identify patterns and inform decision-making.
+
+# Analysis of the Graphs
+The regression coefficients are very small, reflecting the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education shows a negative coefficient (-1.102e-05), high school graduation shows a minimal positive relationship (3.576e-06), and bachelor's degree shows a slight negative relationship (-1.208e-06).
+
+The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in thousands), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales. 
+
+These patterns, while statistically subtle, suggest that education levels have a minor influence on illegal pet ownership in NYC, though other factors likely play important roles in these relationships.
+
+# Limitations
+The analysis is limited by the small sample size, with only five boroughs, which reduces the statistical power and makes it difficult to draw definitive conclusions. The use of borough-level aggregation may mask important variations within boroughs, potentially overlooking localized trends.  Additionally, while the analysis identifies correlations between education levels and incident rates, it cannot establish causation. 
+
+# Conclusion
+Despite its limitations, this method offers a useful framework for understanding the relationship between educational attainment and illegal pet incidents in NYC. By normalizing data and employing regression analysis, the study provides insights that can inform policy decisions and highlight areas for further research. The visualizations effectively communicate complex data, making it accessible to a wider audience and supporting informed decision-making.
+
+
+```{python}
+# 1. Download NYC borough boundaries GeoJSON
+url = "https://data.cityofnewyork.us/api/geospatial/7t3b-ywvw?method=export&format=GeoJSON"
+response = requests.get(url)
+
+# Save the GeoJSON to a file
+geojson_path = "nyc_boroughs.geojson"
+with open(geojson_path, "wb") as file:
+    file.write(response.content)
+
+# Load the GeoJSON data
+boroughs_gdf = gpd.read_file(geojson_path)
+# Merge regression data with GeoJSON
+map_data = boroughs_gdf.merge(district_data, left_on='boro_name', right_on='Borough', how='left')
+
+# Create the map
+m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)
+
+# Add choropleth for regression residuals
+map_data['Residuals'] = model.resid  # Add residuals from the regression model
+folium.Choropleth(
+    geo_data=map_data,
+    data=map_data,
+    columns=['boro_name', 'Residuals'],
+    key_on='feature.properties.boro_name',
+    fill_color='OrRd',
+    fill_opacity=0.7,
+    line_opacity=0.2,
+    legend_name="Regression Residuals",
+).add_to(m)
+
+# Add district names as labels
+for _, row in map_data.iterrows():
+    folium.Marker(
+        location=[row.geometry.centroid.y, row.geometry.centroid.x],  # Use centroid for label position
+        popup=f"Borough: {row['boro_name']}\nResidual: {row['Residuals']:.2f}",
+        icon=folium.DivIcon(html=f"<div style='font-size: 12px; color: black;'>{row['boro_name']}</div>")
+    ).add_to(m)
+
+# Save and display the map
+m.save("regression_map_with_labels.html")
+print("Map saved as 'regression_map_with_labels.html'. Open this file to view it.")
+```
+
+The choropleth map of regression residuals reveals varying model performance across NYC boroughs, with the Bronx showing higher actual incident rates than predicted (red), Manhattan aligning closely with predictions (light orange), and Queens/Brooklyn showing moderate deviations (orange). These patterns suggest that while our education-based regression model captures some patterns in illegal pet ownership, it may not account for other important factors affecting incident rates, particularly in the Bronx. Limitations of this visualization include potential oversimplification of spatial patterns due to borough-level aggregation, which masks within-borough variations, and the challenge of interpreting residuals without considering the underlying population density or socioeconomic factors beyond education that might influence illegal pet ownership patterns.
