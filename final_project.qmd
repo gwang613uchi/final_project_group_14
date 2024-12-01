@@ -244,23 +244,23 @@ chart
 # Calculate percentages and create pie chart with labels
 total = len(merged_df)
 df_with_pct = merged_df.assign(
-    percentage=lambda x: (x.groupby('area_name')['area_name'].transform('count') / total * 100).round(1)
+    percentage=lambda x: (x.groupby('Borough')['Borough'].transform('count') / total * 100).round(1)
 )
 
 # Create a summary dataframe for the text labels
-summary_df = (df_with_pct.groupby('area_name')
-             .agg(count=('area_name', 'count'),
+summary_df = (df_with_pct.groupby('Borough')
+             .agg(count=('Borough', 'count'),
                   percentage=('percentage', 'first'))
              .reset_index()
-             .assign(label=lambda x: x['area_name'] + ': ' + x['percentage'].astype(str) + '%'))
+             .assign(label=lambda x: x['Borough'] + ': ' + x['percentage'].astype(str) + '%'))
 
 # Create pie chart with percentages
 chart = alt.Chart(df_with_pct).mark_arc(outerRadius=180).encode(
     theta='count():Q',
-    color=alt.Color('area_name:N', 
+    color=alt.Color('Borough:N', 
                    scale=alt.Scale(scheme='tableau10'),
                    legend=alt.Legend(title="Borough")),
-    tooltip=['area_name:N', 
+    tooltip=['Borough:N', 
             alt.Tooltip('count():Q', title='Count'),
             alt.Tooltip('percentage:Q', title='Percentage', format='.1f')]
 ).properties(
@@ -312,7 +312,7 @@ plt.show()
 
 # 4. Line Plot: Different education level over time
 ```{python}
-merged_df = pd.read_csv("/Users/kohanchen/Documents/Fall 2024/student30538/problem_sets/final_project/final_project_group_14/final_education_illegal_pets.csv")
+merged_df = pd.read_csv("/content/final_education_illegal_pets.csv")
 
 import altair as alt
 
@@ -355,7 +355,55 @@ chart = alt.Chart(education_levels_long).mark_line(point=True).encode(
 chart
 ```
 
-# 5. Correlation Analysis
+# 5. Bar Plot: Different education level by districts
+```{python}
+import altair as alt
+import pandas as pd
+
+# Aggregate education data by borough
+education_levels_by_district = merged_df.groupby('Borough')[
+    ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus']
+].mean().reset_index()
+
+# Melt the data for easier plotting with Altair
+education_levels_long = education_levels_by_district.melt(
+    id_vars='Borough',
+    value_vars=['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus'],
+    var_name='Education Level',
+    value_name='Population'
+)
+
+# Map the correct labels to the "Education Level" column
+education_level_mapping = {
+    'pop_25_less_9th': 'Less than 9th Grade',
+    'pop_25_hs_grad': 'High School Graduate',
+    'pop_25_bach_plus': 'Bachelor\'s Degree or Higher'
+}
+education_levels_long['Education Level'] = education_levels_long['Education Level'].map(education_level_mapping)
+
+ 
+# Create Altair chart
+chart = alt.Chart(education_levels_long).mark_bar().encode(
+    x=alt.X('Borough:N', title='Borough'),
+    y=alt.Y('Population:Q', title='Average Population'),
+    color=alt.Color('Education Level:N', title='Education Level'),
+    tooltip=['Borough', 'Education Level', 'Population']
+).properties(
+    title='Different Education Levels by District',
+    width=800,
+    height=400
+).configure_axis(
+    labelFontSize=12,
+    titleFontSize=14
+).configure_title(
+    fontSize=16,
+    anchor='middle'
+)
+
+chart
+```
+
+# 6. Correlation Analysis
 
 ```{python}
 import requests
@@ -373,18 +421,22 @@ incident_counts.rename(columns={'Descriptor': 'Illegal_Pet_Incidents'}, inplace=
 
 # Calculate mean education levels by district
 education_data = merged_df.groupby('Borough')[
-    ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus', 'total_population']
+    ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus', 'pop_25_plus']
 ].mean().reset_index()
 
 # Merge datasets
 district_data = pd.merge(incident_counts, education_data, on='Borough')
 
+# Calculate the percentage of each education level relative to the total population
+district_data['pop_25_less_9th_%'] = (district_data['pop_25_less_9th'] / district_data['pop_25_plus']) * 100
+district_data['pop_25_hs_grad_%'] = (district_data['pop_25_hs_grad'] / district_data['pop_25_plus']) * 100
+district_data['pop_25_bach_plus_%'] = (district_data['pop_25_bach_plus'] / district_data['pop_25_plus']) * 100
+
 # Calculate incident percentage
-district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['total_population']) * 100
+district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['pop_25_plus']) * 100
 
-
-# 3. Perform Regression: Using all education levels as predictors
-X = district_data[['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus']]
+# 3. Perform Regression: Using all education levels (as percentages) as predictors
+X = district_data[['pop_25_less_9th_%', 'pop_25_hs_grad_%', 'pop_25_bach_plus_%']]
 y = district_data['Incident_Percentage(%)']
 
 # Add a constant to the model (for the intercept)
@@ -396,16 +448,16 @@ print(model.summary())
 
 # Visualize the relationship for each education level
 for feature, label in zip(
-    ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus'],
-    ["Population 25+ with Less than 9th Grade Education (in 1000)",
-     "Population 25+ with High School Graduation (in 1000)",
-     "Population 25+ with Bachelor's Degree or Higher (in 1000)"]
+    ['pop_25_less_9th_%', 'pop_25_hs_grad_%', 'pop_25_bach_plus_%'],
+    ["% Population with Less than 9th Grade Education",
+     "% Population with High School Graduation",
+     "% Population with Bachelor's Degree or Higher"]
 ):
     plt.figure(figsize=(10, 6))
 
     # Create scatter plot with regression line
     sns.regplot(
-        x=district_data[feature] / 1000,
+        x=district_data[feature],
         y=district_data['Incident_Percentage(%)'],
         ci=None,
         scatter_kws={"s": 50},
@@ -415,7 +467,7 @@ for feature, label in zip(
     # Add district names to each point
     for i in range(len(district_data)):
         plt.text(
-            x=district_data[feature].iloc[i] / 1000,
+            x=district_data[feature].iloc[i],
             y=district_data['Incident_Percentage(%)'].iloc[i],
             s=district_data['Borough'].iloc[i],
             fontsize=10,
@@ -426,7 +478,7 @@ for feature, label in zip(
     # Add title and labels
     plt.title(f"Regression: Illegal Pet Incident Percentage vs. {label}", fontsize=16)
     plt.xlabel(label, fontsize=12)
-    plt.ylabel("Illegal Pet Incident Percentage(%)", fontsize=12)
+    plt.ylabel("Illegal Pet Incident Percentage (%)", fontsize=12)
     plt.tight_layout()
     plt.show()
 ```
