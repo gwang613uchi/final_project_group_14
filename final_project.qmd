@@ -76,7 +76,6 @@ column_rename_map = {
     "GEO_ID": "geo_id",  # Geographic identifier
     "NAME": "area_name",  # Geographic area name
     "YEAR": "year",  # Year of data
-    "S1501_C01_001E": "total_population",  # Total population
     "S1501_C01_006E": "pop_25_plus",  # Population 25 years and over
     "S1501_C01_007E": "pop_25_less_9th",  # 25 years and over: Less than 9th grade
     "S1501_C01_009E": "pop_25_hs_grad",  # 25 years and over: High school graduate
