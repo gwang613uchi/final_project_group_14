@@ -289,25 +289,50 @@ final_chart
 
 # 3. Choropleth Map
 ```{python}
-# Count complaints by ZIP code
+import altair as alt
+import geopandas as gpd
+import json
+
+# Convert GeoDataFrame to GeoJSON-like format for Altair
+def geojson_to_altair(gdf):
+    return json.loads(gdf.to_json())
+
+# Prepare the data
 pet_counts = merged_df.groupby('Incident Zip').size().reset_index(name='complaints_count')
-
-# Merge counts with GeoDataFrame
 nyc_zips = nyc_zips.merge(pet_counts, left_on='postalCode', right_on='Incident Zip', how='left')
-
-# Fill NaN values with 0 for ZIP codes with no complaints
 nyc_zips['complaints_count'] = nyc_zips['complaints_count'].fillna(0)
 
-# Plotting the choropleth map
-fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-nyc_zips.plot(column='complaints_count', ax=ax, legend=True,
-              cmap='OrRd',  # Color map for density
-              legend_kwds={'label': "Number of Illegal Pet Complaints by ZIP",
-                           'orientation': "vertical",
-                           'shrink': 0.6})  # Adjust legend size
-ax.set_title('Choropleth Map of Illegal Pet Complaints in NYC by ZIP Code')
-plt.axis('off')  # Turn off the axis
-plt.show()
+# Convert to Altair-compatible format
+zip_geojson = geojson_to_altair(nyc_zips)
+zip_data = nyc_zips[['postalCode', 'complaints_count']].copy()
+
+# Create the choropleth map
+choropleth = alt.Chart(alt.Data(values=zip_geojson['features'])).mark_geoshape(
+    stroke='white',
+    strokeWidth=0.5
+).encode(
+    color=alt.Color(
+        'complaints_count:Q',
+        title='Number of Illegal Pet Complaints',
+        scale=alt.Scale(scheme='orangered'),
+        legend=alt.Legend(orient='right')
+    ),
+    tooltip=[
+        alt.Tooltip('properties.postalCode:N', title='ZIP Code'),
+        alt.Tooltip('properties.complaints_count:Q', title='Complaints')
+    ]
+).transform_lookup(
+    lookup='properties.postalCode',
+    from_=alt.LookupData(zip_data, 'postalCode', ['complaints_count'])
+).properties(
+    width=800,
+    height=600,
+    title='Illegal Pet Complaints in NYC by ZIP Code'
+).configure_view(
+    strokeWidth=0
+)
+
+choropleth
 ```
 
 # 4. Line Plot: Different education level over time

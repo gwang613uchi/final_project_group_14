@@ -5,14 +5,18 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import os
 import seaborn as sns
+from shinywidgets import render_altair, output_widget
+import sys
+import json
+print(sys.executable)
 
 # Create a directory for temporary plot files if it doesn't exist
 os.makedirs("temp_plots", exist_ok=True)
 
 # Load data
-geojson_path = 'basic-app/Map_data/nyc-zips.geojson'
+geojson_path = 'Map_data/nyc-zips.geojson'
 nyc_zips = gpd.read_file(geojson_path)
-merged_df = pd.read_csv("basic-app/final_education_illegal_pets.csv")
+merged_df = pd.read_csv("final_education_illegal_pets.csv")
 
 app_ui = ui.page_fluid(
     ui.h2("Illegal Pets Analysis"),
@@ -88,11 +92,11 @@ app_ui = ui.page_fluid(
         ),
         ui.panel_conditional(
             "input.plot_type === 'choropleth'",
-            ui.output_plot("choropleth_plot", height="600px")
+            output_widget("choropleth_plot")
         ),
         ui.panel_conditional(
             "input.plot_type === 'education_trend'",
-            ui.output_plot("education_trend_plot", height="500px")
+            output_widget("education_trend_plot")
         ),
         ui.panel_conditional(
             "input.plot_type === 'correlation'",
@@ -103,20 +107,19 @@ app_ui = ui.page_fluid(
 
 def server(input, output, session):
     @output
-    @render.plot
+    @render_altair
     def choropleth_plot():
         if input.plot_type() != "choropleth":
             return None
+        
         # Convert Created Date to datetime
         merged_df['Created Date'] = pd.to_datetime(merged_df['Created Date'])
         
         # Filter data based on toggle state
         if not input.range_toggle():
-            # Single year filter
             year_data = merged_df[merged_df['Created Date'].dt.year == input.single_year()]
             title_year = str(input.single_year())
         else:
-            # Year range filter
             year_range = input.year_range()
             year_data = merged_df[
                 (merged_df['Created Date'].dt.year >= year_range[0]) & 
@@ -124,49 +127,62 @@ def server(input, output, session):
             ]
             title_year = f"{year_range[0]}-{year_range[1]}"
         
-        # Drop rows with NaN ZIP codes
+        # Clean and prepare data
         merged_df_clean = year_data.dropna(subset=['Incident Zip'])
-        
-        # Convert ZIP codes to strings without decimals
         merged_df_clean['Incident Zip'] = merged_df_clean['Incident Zip'].apply(lambda x: str(int(x)))
-        
-        # Count complaints by ZIP code
         pet_counts = merged_df_clean.groupby('Incident Zip').size().reset_index(name='complaints_count')
         
-        # Merge counts with GeoDataFrame
+        # Merge with GeoDataFrame and prepare for Altair
         nyc_zips_merged = nyc_zips.merge(
             pet_counts, 
             left_on='postalCode', 
             right_on='Incident Zip', 
             how='left'
         )
-        
-        # Fill NaN values with 0
         nyc_zips_merged['complaints_count'] = nyc_zips_merged['complaints_count'].fillna(0)
         
-        # Create the plot
-        fig, ax = plt.subplots(1, 1, figsize=(15, 15))
-        nyc_zips_merged.plot(
-            column='complaints_count',
-            ax=ax,
-            legend=True,
-            cmap='OrRd',
-            legend_kwds={
-                'label': f"Number of Illegal Pet Complaints by ZIP ({title_year})",
-                'orientation': "vertical",
-                'shrink': 0.8
-            }
+        # Convert to Altair-compatible format
+        zip_geojson = json.loads(nyc_zips_merged.to_json())
+        zip_data = nyc_zips_merged[['postalCode', 'complaints_count']].copy()
+        
+        # Create Altair chart
+        choropleth = alt.Chart(
+            alt.Data(values=zip_geojson['features'])
+        ).mark_geoshape(
+            stroke='white',
+            strokeWidth=0.5
+        ).encode(
+            color=alt.Color(
+                'complaints_count:Q',
+                title='Number of Complaints',
+                scale=alt.Scale(scheme='orangered'),
+                legend=alt.Legend(
+                    orient='right',
+                    title=f"Illegal Pet Complaints\n({title_year})"
+                )
+            ),
+            tooltip=[
+                alt.Tooltip('properties.postalCode:N', title='ZIP Code'),
+                alt.Tooltip('properties.complaints_count:Q', title='Complaints')
+            ]
+        ).transform_lookup(
+            lookup='properties.postalCode',
+            from_=alt.LookupData(zip_data, 'postalCode', ['complaints_count'])
+        ).properties(
+            width=800,
+            height=600,
+            title=f'Illegal Pet Complaints in NYC by ZIP Code ({title_year})'
+        ).configure_view(
+            strokeWidth=0
+        ).configure_title(
+            fontSize=20,
+            anchor='middle'
         )
-        ax.set_title(f'Choropleth Map of Illegal Pet Complaints in NYC by ZIP Code ({title_year})', 
-                     pad=20,
-                     y=1.02
-                     )
-        plt.axis('off')
-        plt.subplots_adjust(top=0.9)
-        return fig
+        
+        return choropleth
 
     @output
-    @render.plot
+    @render_altair
     def education_trend_plot():
         if input.plot_type() != "education_trend":
             return None
@@ -207,22 +223,20 @@ def server(input, output, session):
         }
         education_levels_long['Education Level'] = education_levels_long['Education Level'].map(education_level_mapping)
 
-        # Create the plot using matplotlib and seaborn
-        fig, ax = plt.subplots(figsize=(12, 7))
-        sns.lineplot(
-            data=education_levels_long,
-            x='year',
-            y='Population',
-            hue='Education Level',
-            marker='o'
-        )
-        plt.title(f"Education Levels Over Time ({year_range[0]}-{year_range[1]})", fontsize=16)
-        plt.xlabel("Year", fontsize=10)
-        plt.ylabel("Average Population", fontsize=10)
-        plt.legend(title='Education Level')
-        plt.tight_layout()
-        
-        return fig
+        # Create Altair chart
+        chart = alt.Chart(education_levels_long).mark_line(point=True).encode(
+            x=alt.X('year:Q', title='Year'),
+            y=alt.Y('Population:Q', title='Average Population'),
+            color=alt.Color('Education Level:N', title='Education Level'),
+            tooltip=['year:Q', 'Education Level:N', 
+                    alt.Tooltip('Population:Q', format=',')]
+        ).properties(
+            title=f'Education Levels Over Time ({year_range[0]}-{year_range[1]})',
+            width=800,
+            height=500
+        ).interactive()
+    
+        return chart
 
     @output
     @render.plot
