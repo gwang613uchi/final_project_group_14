@@ -289,25 +289,50 @@ final_chart
 
 # 3. Choropleth Map
 ```{python}
+import altair as alt
+import geopandas as gpd
+import pandas as pd
+import json
+
+# Load GeoJSON file
+geojson_path = 'nyc-zips.geojson'
+nyc_zips = gpd.read_file(geojson_path)
+merged_df = pd.read_csv("final_education_illegal_pets.csv")
+
+# Data Preprocessing
+merged_df = merged_df.dropna(subset=['Incident Zip'])
+merged_df['Incident Zip'] = merged_df['Incident Zip'].apply(lambda x: str(int(x)))
+nyc_zips['postalCode'] = nyc_zips['postalCode'].astype(str)
+
 # Count complaints by ZIP code
 pet_counts = merged_df.groupby('Incident Zip').size().reset_index(name='complaints_count')
 
 # Merge counts with GeoDataFrame
 nyc_zips = nyc_zips.merge(pet_counts, left_on='postalCode', right_on='Incident Zip', how='left')
-
-# Fill NaN values with 0 for ZIP codes with no complaints
 nyc_zips['complaints_count'] = nyc_zips['complaints_count'].fillna(0)
 
-# Plotting the choropleth map
-fig, ax = plt.subplots(1, 1, figsize=(12, 8))
-nyc_zips.plot(column='complaints_count', ax=ax, legend=True,
-              cmap='OrRd',  # Color map for density
-              legend_kwds={'label': "Number of Illegal Pet Complaints by ZIP",
-                           'orientation': "vertical",
-                           'shrink': 0.6})  # Adjust legend size
-ax.set_title('Choropleth Map of Illegal Pet Complaints in NYC by ZIP Code')
-plt.axis('off')  # Turn off the axis
-plt.show()
+# Convert GeoJSON to TopoJSON (Altair supports TopoJSON)
+geojson_data = json.loads(nyc_zips.to_json())
+
+# Create Altair Chart
+choropleth = alt.Chart(alt.Data(values=geojson_data['features'])).mark_geoshape().encode(
+    color=alt.Color('properties.complaints_count:Q', 
+                    scale=alt.Scale(scheme='orangered'), 
+                    title='Illegal Pet Complaints'),
+    tooltip=[
+        alt.Tooltip('properties.postalCode:N', title='ZIP Code'),
+        alt.Tooltip('properties.complaints_count:Q', title='Complaints')
+    ]
+).transform_calculate(
+    complaints_count='datum.properties.complaints_count'
+).properties(
+    title='Choropleth Map of Illegal Pet Complaints in NYC by ZIP Code',
+    width=800,
+    height=600
+)
+
+# Display the chart
+choropleth
 ```
 
 # 4. Line Plot: Different education level over time
@@ -491,7 +516,7 @@ This method normalizes incident counts by population size, allowing fair compari
 By normalizing incident counts per 10,000 people, the method ensures fair comparisons across boroughs with different population sizes. Regression analysis quantifies the relationship between education levels and incident rates, providing insights into potential trends. Visualizations, such as scatter plots, make these relationships clear and accessible, helping to identify patterns and inform decision-making.
 
 # Analysis of the Graphs
-The regression coefficients are very small, reflecting the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education shows a negative coefficient (-1.102e-05), high school graduation shows a minimal positive relationship (3.576e-06), and bachelor's degree shows a slight negative relationship (-1.208e-06).
+The regression coefficients are very small, reflecting the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education shows a negative coefficient (-0.0466), high school graduation shows a slight negative relationship (-0.0335), and bachelor's degree shows a negative relationship (-0.0400).
 
 The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in thousands), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales. 
 
@@ -523,7 +548,7 @@ map_data = boroughs_gdf.merge(district_data, left_on='boro_name', right_on='Boro
 m = folium.Map(location=[40.7128, -74.0060], zoom_start=10)
 
 # Add choropleth for regression residuals
-map_data['Residuals'] = model.resid  # Add residuals from the regression model
+map_data['Residuals'] = model.resid  
 folium.Choropleth(
     geo_data=map_data,
     data=map_data,
