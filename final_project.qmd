@@ -82,7 +82,6 @@ column_rename_map = {
     "GEO_ID": "geo_id",  # Geographic identifier
     "NAME": "area_name",  # Geographic area name
     "YEAR": "year",  # Year of data
-    "S1501_C01_001E": "total_population",  # Total population
     "S1501_C01_006E": "pop_25_plus",  # Population 25 years and over
     "S1501_C01_007E": "pop_25_less_9th",  # 25 years and over: Less than 9th grade
     "S1501_C01_009E": "pop_25_hs_grad",  # 25 years and over: High school graduate
@@ -106,7 +105,9 @@ edu_cleaned = filtered_df[filtered_df["geo_id"] != "Geographic Area Name"]
 # Adjust variables to accommodate different years' approaches to estimate (volume or percentage)
 # Transform year 2010 to year 2014's 'pop_25_less_9th' variable to be the result between 'pop_25_less_9th' and 'pop_25_plus'
 for year in range(2010, 2015):
-    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_less_9th'] = pd.to_numeric(edu_cleaned['pop_25_less_9th'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce')
+    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_less_9th'] = pd.to_numeric(edu_cleaned['pop_25_less_9th'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce') / 100
+    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_hs_grad'] = pd.to_numeric(edu_cleaned['pop_25_hs_grad'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce') / 100
+    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_bach_plus'] = pd.to_numeric(edu_cleaned['pop_25_bach_plus'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce') / 100
 
 # Cleaning Illegal Pets Data
 # List of columns to drop
