@@ -15,16 +15,16 @@ import altair as alt
 # Import Illegal Pets Data and Education Attainment Data in NYC
 ```{python}
 # Illegal Pets Data
-illegal_pets = pd.read_csv("Illegal Pets/illegal_animals_kept_as_pets_20241116.csv")
+illegal_pets = pd.read_csv("data/Illegal Pets/illegal_animals_kept_as_pets_20241116.csv")
 
 # Education Attainment Data
-education = pd.read_csv("Education Attainment/ACSST5Y2010.S1501-Data.csv")
+education = pd.read_csv("data/Education Attainment/ACSST5Y2010.S1501-Data.csv")
 ```
 
 # Combine all education data from 2010 to 2022
 ```{python}
 # Directory where all CSV files are stored
-directory = "Education Attainment"
+directory = "data/Education Attainment"
 
 # Collect all file paths in the directory that match the naming pattern
 csv_files = [os.path.join(directory, file) for file in os.listdir(directory) if file.endswith(".csv")]
@@ -212,7 +212,7 @@ chart = alt.Chart(merged_df).mark_bar().encode(
     tooltip=['Descriptor', alt.Tooltip('count():Q', title='Count')]
 ).properties(
     title='Types of Illegal Pets in NYC',
-    width=600,
+    width=500,
     height=400
 ).configure_axis(
     labelFontSize=12,
@@ -223,6 +223,7 @@ chart = alt.Chart(merged_df).mark_bar().encode(
 )
 
 chart
+chart.save("pictures/bar_chart_types_of_illegal_pets.png")
 ```
 
 # 2. Pie chart of incidents across boroughs
@@ -255,7 +256,7 @@ chart = alt.Chart(df_with_pct).mark_arc(outerRadius=180).encode(
         'fontSize': 16,
         'anchor': 'middle'
     },
-    width=400,
+    width=500,
     height=400
 )
 
@@ -271,6 +272,7 @@ final_chart = (chart + text).configure_view(
 )
 
 final_chart
+final_chart.save("pictures/pie_chart_incidents_by_borough.png")
 ```
 
 # 3. Choropleth Map
@@ -312,12 +314,13 @@ choropleth = alt.Chart(alt.Data(values=geojson_data['features'])).mark_geoshape(
     complaints_count='datum.properties.complaints_count'
 ).properties(
     title='Choropleth Map of Illegal Pet Complaints in NYC by ZIP Code',
-    width=800,
-    height=600
+    width=500,
+    height=400
 )
 
 # Display the chart
 choropleth
+choropleth.save("pictures/choropleth_map_illegal_pets.png")
 ```
 
 # 4. Line Plot: Different education level over time
@@ -351,7 +354,7 @@ chart = alt.Chart(education_levels_long).mark_line(point=True).encode(
     tooltip=['year', 'Education Level', alt.Tooltip('Population:Q', format=',')]
 ).properties(
     title='Different Education Levels Over Time',
-    width=800,
+    width=500,
     height=400
 ).configure_axis(
     labelFontSize=12,
@@ -398,7 +401,7 @@ chart = alt.Chart(education_levels_long).mark_bar().encode(
     tooltip=['Borough', 'Education Level', 'Population']
 ).properties(
     title='Different Education Levels by District',
-    width=800,
+    width=500,
     height=400
 ).configure_axis(
     labelFontSize=12,
@@ -483,7 +486,7 @@ for feature, label in zip(
         ]
     ).properties(
         title=f"Regression: Illegal Pet Incident Percentage vs. {label}",
-        width=800,
+        width=500,
         height=400
     )
 
@@ -503,6 +506,7 @@ for feature, label in zip(
         labelFontSize=12,
         titleFontSize=14
     ))
+    combined_chart.save(f"pictures/regression_plot_{feature}.png")
 ```
 
 # Why Use This Method
