@@ -352,8 +352,6 @@ choropleth
 
 # 4. Line Plot: Different education level over time
 ```{python}
-merged_df = pd.read_csv("final_education_illegal_pets.csv")
-
 import altair as alt
 
 # Prepare the data (keeping the same data preparation steps)
