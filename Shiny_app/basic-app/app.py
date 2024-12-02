@@ -5,14 +5,18 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 import os
 import seaborn as sns
+from shinywidgets import render_altair, output_widget
+import sys
+import json
+print(sys.executable)
 
 # Create a directory for temporary plot files if it doesn't exist
 os.makedirs("temp_plots", exist_ok=True)
 
 # Load data
-geojson_path = 'basic-app/Map_data/nyc-zips.geojson'
+geojson_path = 'Map_data/nyc-zips.geojson'
 nyc_zips = gpd.read_file(geojson_path)
-merged_df = pd.read_csv("basic-app/final_education_illegal_pets.csv")
+merged_df = pd.read_csv("final_education_illegal_pets.csv")
 
 app_ui = ui.page_fluid(
     ui.h2("Illegal Pets Analysis"),
@@ -88,35 +92,34 @@ app_ui = ui.page_fluid(
         ),
         ui.panel_conditional(
             "input.plot_type === 'choropleth'",
-            ui.output_plot("choropleth_plot", height="600px")
+            output_widget("choropleth_plot")
         ),
         ui.panel_conditional(
             "input.plot_type === 'education_trend'",
-            ui.output_plot("education_trend_plot", height="500px")
+            output_widget("education_trend_plot")
         ),
         ui.panel_conditional(
             "input.plot_type === 'correlation'",
-            ui.output_plot("correlation_plot", height="500px")
+            output_widget("correlation_plot")
         )
     )
 )
 
 def server(input, output, session):
     @output
-    @render.plot
+    @render_altair
     def choropleth_plot():
         if input.plot_type() != "choropleth":
             return None
+        
         # Convert Created Date to datetime
         merged_df['Created Date'] = pd.to_datetime(merged_df['Created Date'])
         
         # Filter data based on toggle state
         if not input.range_toggle():
-            # Single year filter
             year_data = merged_df[merged_df['Created Date'].dt.year == input.single_year()]
             title_year = str(input.single_year())
         else:
-            # Year range filter
             year_range = input.year_range()
             year_data = merged_df[
                 (merged_df['Created Date'].dt.year >= year_range[0]) & 
@@ -124,49 +127,62 @@ def server(input, output, session):
             ]
             title_year = f"{year_range[0]}-{year_range[1]}"
         
-        # Drop rows with NaN ZIP codes
+        # Clean and prepare data
         merged_df_clean = year_data.dropna(subset=['Incident Zip'])
-        
-        # Convert ZIP codes to strings without decimals
         merged_df_clean['Incident Zip'] = merged_df_clean['Incident Zip'].apply(lambda x: str(int(x)))
-        
-        # Count complaints by ZIP code
         pet_counts = merged_df_clean.groupby('Incident Zip').size().reset_index(name='complaints_count')
         
-        # Merge counts with GeoDataFrame
+        # Merge with GeoDataFrame and prepare for Altair
         nyc_zips_merged = nyc_zips.merge(
             pet_counts, 
             left_on='postalCode', 
             right_on='Incident Zip', 
             how='left'
         )
-        
-        # Fill NaN values with 0
         nyc_zips_merged['complaints_count'] = nyc_zips_merged['complaints_count'].fillna(0)
         
-        # Create the plot
-        fig, ax = plt.subplots(1, 1, figsize=(15, 15))
-        nyc_zips_merged.plot(
-            column='complaints_count',
-            ax=ax,
-            legend=True,
-            cmap='OrRd',
-            legend_kwds={
-                'label': f"Number of Illegal Pet Complaints by ZIP ({title_year})",
-                'orientation': "vertical",
-                'shrink': 0.8
-            }
+        # Convert to Altair-compatible format
+        zip_geojson = json.loads(nyc_zips_merged.to_json())
+        zip_data = nyc_zips_merged[['postalCode', 'complaints_count']].copy()
+        
+        # Create Altair chart
+        choropleth = alt.Chart(
+            alt.Data(values=zip_geojson['features'])
+        ).mark_geoshape(
+            stroke='white',
+            strokeWidth=0.5
+        ).encode(
+            color=alt.Color(
+                'complaints_count:Q',
+                title='Number of Complaints',
+                scale=alt.Scale(scheme='orangered'),
+                legend=alt.Legend(
+                    orient='right',
+                    title=f"Illegal Pet Complaints\n({title_year})"
+                )
+            ),
+            tooltip=[
+                alt.Tooltip('properties.postalCode:N', title='ZIP Code'),
+                alt.Tooltip('properties.complaints_count:Q', title='Complaints')
+            ]
+        ).transform_lookup(
+            lookup='properties.postalCode',
+            from_=alt.LookupData(zip_data, 'postalCode', ['complaints_count'])
+        ).properties(
+            width=800,
+            height=600,
+            title=f'Illegal Pet Complaints in NYC by ZIP Code ({title_year})'
+        ).configure_view(
+            strokeWidth=0
+        ).configure_title(
+            fontSize=20,
+            anchor='middle'
         )
-        ax.set_title(f'Choropleth Map of Illegal Pet Complaints in NYC by ZIP Code ({title_year})', 
-                     pad=20,
-                     y=1.02
-                     )
-        plt.axis('off')
-        plt.subplots_adjust(top=0.9)
-        return fig
+        
+        return choropleth
 
     @output
-    @render.plot
+    @render_altair
     def education_trend_plot():
         if input.plot_type() != "education_trend":
             return None
@@ -184,18 +200,18 @@ def server(input, output, session):
         # Convert education levels tuple to list
         selected_levels = list(input.education_levels())
         
-        # Prepare the data with selected education levels
+        # Prepare the data
         education_levels_over_time = filtered_df.groupby('year')[
-            selected_levels  # 使用转换后的列表
+            selected_levels
         ].mean().reset_index()
 
         # Convert all columns to numeric
-        for col in selected_levels:  # 使用转换后的列表
+        for col in selected_levels:
             education_levels_over_time[col] = pd.to_numeric(education_levels_over_time[col])
 
         education_levels_long = education_levels_over_time.melt(
             id_vars='year',
-            value_vars=selected_levels,  # 使用转换后的列表
+            value_vars=selected_levels,
             var_name='Education Level',
             value_name='Population'
         )
@@ -207,25 +223,59 @@ def server(input, output, session):
         }
         education_levels_long['Education Level'] = education_levels_long['Education Level'].map(education_level_mapping)
 
-        # Create the plot using matplotlib and seaborn
-        fig, ax = plt.subplots(figsize=(12, 7))
-        sns.lineplot(
-            data=education_levels_long,
-            x='year',
-            y='Population',
-            hue='Education Level',
-            marker='o'
-        )
-        plt.title(f"Education Levels Over Time ({year_range[0]}-{year_range[1]})", fontsize=16)
-        plt.xlabel("Year", fontsize=10)
-        plt.ylabel("Average Population", fontsize=10)
-        plt.legend(title='Education Level')
-        plt.tight_layout()
-        
-        return fig
+        # Create base chart with improved styling
+        chart = alt.Chart(education_levels_long).mark_line(
+            point=True,
+            strokeWidth=3,
+            opacity=0.8
+        ).encode(
+            x=alt.X('year:O', 
+                    title='Year',
+                    axis=alt.Axis(
+                        labelAngle=0,
+                        labelFontSize=12,
+                        titleFontSize=14
+                    )),
+            y=alt.Y('Population:Q', 
+                    title='Average Population',
+                    axis=alt.Axis(
+                        labelFontSize=12,
+                        titleFontSize=14,
+                        format=',.0f'  # Add thousand separators
+                    )),
+            color=alt.Color('Education Level:N', 
+                           title='Education Level',
+                           legend=alt.Legend(
+                               orient='right',
+                               titleFontSize=12,
+                               labelFontSize=11
+                           )),
+            tooltip=[
+                alt.Tooltip('year:O', title='Year'),
+                alt.Tooltip('Education Level:N', title='Education Level'),
+                alt.Tooltip('Population:Q', title='Population', format=',.0f')
+            ]
+        ).properties(
+            title={
+                'text': f'Education Levels Over Time ({year_range[0]}-{year_range[1]})',
+                'fontSize': 16,
+                'anchor': 'middle'
+            },
+            width=800,
+            height=500
+        ).configure_view(
+            strokeWidth=0
+        ).configure_axis(
+            grid=True,
+            gridOpacity=0.2
+        ).configure_point(
+            size=100
+        ).interactive()
+    
+        return chart
 
     @output
-    @render.plot
+    @render_altair
     def correlation_plot():
         if input.plot_type() != "correlation":
             return None
@@ -236,55 +286,97 @@ def server(input, output, session):
 
         # Calculate mean education levels by district
         education_data = merged_df.groupby('Borough')[
-            ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus', 'total_population']
+            ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus', 'pop_25_plus']
         ].mean().reset_index()
 
         # Merge datasets
         district_data = pd.merge(incident_counts, education_data, on='Borough')
 
-        # Calculate incident percentage
-        district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['total_population']) * 100
-
+        # Calculate percentages
+        district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['pop_25_plus']) * 100
+        
         # Get selected education level
         feature = input.education_level()
         
+        # Calculate education percentage
+        district_data[f'{feature}_%'] = (district_data[feature] / district_data['pop_25_plus']) * 100
+        
         # Create mapping for labels
         education_labels = {
-            'pop_25_less_9th': "Population 25+ with Less than 9th Grade Education (in 1000)",
-            'pop_25_hs_grad': "Population 25+ with High School Graduation (in 1000)",
-            'pop_25_bach_plus': "Population 25+ with Bachelor's Degree or Higher (in 1000)"
+            'pop_25_less_9th': "Population with Less than 9th Grade Education (%)",
+            'pop_25_hs_grad': "Population with High School Graduation (%)",
+            'pop_25_bach_plus': "Population with Bachelor's Degree or Higher (%)"
         }
-        
-        # Create the plot
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        # Create scatter plot with regression line
-        sns.regplot(
-            x=district_data[feature] / 1000,
-            y=district_data['Incident_Percentage(%)'],
-            ci=None,
-            scatter_kws={"s": 50},
-            line_kws={"color": "red"},
+
+        # Determine axis ranges with padding
+        x_min = district_data[f'{feature}_%'].min() * 0.9
+        x_max = district_data[f'{feature}_%'].max() * 1.1
+        y_min = district_data['Incident_Percentage(%)'].min() * 0.9
+        y_max = district_data['Incident_Percentage(%)'].max() * 1.1
+
+        # Create scatter plot
+        scatter = alt.Chart(district_data).mark_circle(
+            size=100,
+            opacity=0.7
+        ).encode(
+            x=alt.X(
+                f'{feature}_%:Q',
+                title=education_labels[feature],
+                scale=alt.Scale(domain=[x_min, x_max])
+            ),
+            y=alt.Y(
+                'Incident_Percentage(%):Q',
+                title='Illegal Pet Incident Percentage (%)',
+                scale=alt.Scale(domain=[y_min, y_max])
+            ),
+            tooltip=[
+                alt.Tooltip('Borough:N', title='Borough'),
+                alt.Tooltip(f'{feature}_%:Q', title=education_labels[feature], format='.1f'),
+                alt.Tooltip('Incident_Percentage(%):Q', title='Incident %', format='.1f')
+            ]
         )
 
-        # Add district names to each point
-        for i in range(len(district_data)):
-            plt.text(
-                x=district_data[feature].iloc[i] / 1000,
-                y=district_data['Incident_Percentage(%)'].iloc[i],
-                s=district_data['Borough'].iloc[i],
-                fontsize=10,
-                color="blue",
-                ha="right"
-            )
+        # Add text labels for boroughs
+        text = scatter.mark_text(
+            align='left',
+            baseline='middle',
+            dx=15,
+            fontSize=12
+        ).encode(
+            text='Borough:N'
+        )
 
-        # Add title and labels
-        plt.title(f"Regression: Illegal Pet Incident Percentage vs. {education_labels[feature]}", 
-                 fontsize=13)
-        plt.xlabel(education_labels[feature], fontsize=12)
-        plt.ylabel("Illegal Pet Incident Percentage(%)", fontsize=12)
-        plt.tight_layout()
-        
-        return fig
+        # Get the actual min and max of the x values (without padding)
+        x_min_actual = district_data[f'{feature}_%'].min()
+        x_max_actual = district_data[f'{feature}_%'].max()
+
+        # Add regression line with restricted domain
+        regression = scatter.transform_regression(
+            f'{feature}_%', 'Incident_Percentage(%)',
+            extent=[x_min_actual, x_max_actual]  # Add this line to restrict regression line
+        ).mark_line(
+            color='red',
+            strokeWidth=2
+        )
+
+        # Combine all layers
+        chart = (scatter + regression + text).properties(
+            width=800,
+            height=500,
+            title={
+                'text': f"Regression: Illegal Pet Incident Percentage vs. {education_labels[feature]}",
+                'fontSize': 16,
+                'anchor': 'middle'
+            }
+        ).configure_axis(
+            labelFontSize=12,
+            titleFontSize=14,
+            grid=True,
+            gridOpacity=0.2
+        ).configure_view(
+            strokeWidth=0
+        )
+
+        return chart
 
 app = App(app_ui, server)
