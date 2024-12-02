@@ -10,7 +10,6 @@ import pandas as pd
 import os
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import altair as alt
 ```
 
 # Import Illegal Pets Data and Education Attainment Data in NYC
@@ -213,7 +212,7 @@ print(merged_df)
 # Load Map Data, drop NA and convert data type
 ```{python}
 # Load the GeoJSON file
-geojson_path = 'Map_data/nyc-zips.geojson'
+geojson_path = 'nyc-zips.geojson'
 nyc_zips = gpd.read_file(geojson_path)
 
 # Drop rows with NaN ZIP codes or fill them with a placeholder
@@ -311,7 +310,8 @@ import pandas as pd
 import json
 
 # Load GeoJSON file
-
+geojson_path = 'nyc-zips.geojson'
+nyc_zips = gpd.read_file(geojson_path)
 merged_df = pd.read_csv("final_education_illegal_pets.csv")
 
 # Data Preprocessing
@@ -448,6 +448,7 @@ import requests
 import geopandas as gpd
 import pandas as pd
 import statsmodels.api as sm
+import matplotlib.pyplot as plt
 import seaborn as sns
 import folium
 
