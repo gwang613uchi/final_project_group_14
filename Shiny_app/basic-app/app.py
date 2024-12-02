@@ -100,7 +100,7 @@ app_ui = ui.page_fluid(
         ),
         ui.panel_conditional(
             "input.plot_type === 'correlation'",
-            ui.output_plot("correlation_plot", height="500px")
+            output_widget("correlation_plot")
         )
     )
 )
@@ -200,18 +200,18 @@ def server(input, output, session):
         # Convert education levels tuple to list
         selected_levels = list(input.education_levels())
         
-        # Prepare the data with selected education levels
+        # Prepare the data
         education_levels_over_time = filtered_df.groupby('year')[
-            selected_levels  # 使用转换后的列表
+            selected_levels
         ].mean().reset_index()
 
         # Convert all columns to numeric
-        for col in selected_levels:  # 使用转换后的列表
+        for col in selected_levels:
             education_levels_over_time[col] = pd.to_numeric(education_levels_over_time[col])
 
         education_levels_long = education_levels_over_time.melt(
             id_vars='year',
-            value_vars=selected_levels,  # 使用转换后的列表
+            value_vars=selected_levels,
             var_name='Education Level',
             value_name='Population'
         )
@@ -223,23 +223,59 @@ def server(input, output, session):
         }
         education_levels_long['Education Level'] = education_levels_long['Education Level'].map(education_level_mapping)
 
-        # Create Altair chart
-        chart = alt.Chart(education_levels_long).mark_line(point=True).encode(
-            x=alt.X('year:Q', title='Year'),
-            y=alt.Y('Population:Q', title='Average Population'),
-            color=alt.Color('Education Level:N', title='Education Level'),
-            tooltip=['year:Q', 'Education Level:N', 
-                    alt.Tooltip('Population:Q', format=',')]
+        # Create base chart with improved styling
+        chart = alt.Chart(education_levels_long).mark_line(
+            point=True,
+            strokeWidth=3,
+            opacity=0.8
+        ).encode(
+            x=alt.X('year:O', 
+                    title='Year',
+                    axis=alt.Axis(
+                        labelAngle=0,
+                        labelFontSize=12,
+                        titleFontSize=14
+                    )),
+            y=alt.Y('Population:Q', 
+                    title='Average Population',
+                    axis=alt.Axis(
+                        labelFontSize=12,
+                        titleFontSize=14,
+                        format=',.0f'  # Add thousand separators
+                    )),
+            color=alt.Color('Education Level:N', 
+                           title='Education Level',
+                           legend=alt.Legend(
+                               orient='right',
+                               titleFontSize=12,
+                               labelFontSize=11
+                           )),
+            tooltip=[
+                alt.Tooltip('year:O', title='Year'),
+                alt.Tooltip('Education Level:N', title='Education Level'),
+                alt.Tooltip('Population:Q', title='Population', format=',.0f')
+            ]
         ).properties(
-            title=f'Education Levels Over Time ({year_range[0]}-{year_range[1]})',
+            title={
+                'text': f'Education Levels Over Time ({year_range[0]}-{year_range[1]})',
+                'fontSize': 16,
+                'anchor': 'middle'
+            },
             width=800,
             height=500
+        ).configure_view(
+            strokeWidth=0
+        ).configure_axis(
+            grid=True,
+            gridOpacity=0.2
+        ).configure_point(
+            size=100
         ).interactive()
     
         return chart
 
     @output
-    @render.plot
+    @render_altair
     def correlation_plot():
         if input.plot_type() != "correlation":
             return None
@@ -250,55 +286,97 @@ def server(input, output, session):
 
         # Calculate mean education levels by district
         education_data = merged_df.groupby('Borough')[
-            ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus', 'total_population']
+            ['pop_25_less_9th', 'pop_25_hs_grad', 'pop_25_bach_plus', 'pop_25_plus']
         ].mean().reset_index()
 
         # Merge datasets
         district_data = pd.merge(incident_counts, education_data, on='Borough')
 
-        # Calculate incident percentage
-        district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['total_population']) * 100
-
+        # Calculate percentages
+        district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['pop_25_plus']) * 100
+        
         # Get selected education level
         feature = input.education_level()
         
+        # Calculate education percentage
+        district_data[f'{feature}_%'] = (district_data[feature] / district_data['pop_25_plus']) * 100
+        
         # Create mapping for labels
         education_labels = {
-            'pop_25_less_9th': "Population 25+ with Less than 9th Grade Education (in 1000)",
-            'pop_25_hs_grad': "Population 25+ with High School Graduation (in 1000)",
-            'pop_25_bach_plus': "Population 25+ with Bachelor's Degree or Higher (in 1000)"
+            'pop_25_less_9th': "Population with Less than 9th Grade Education (%)",
+            'pop_25_hs_grad': "Population with High School Graduation (%)",
+            'pop_25_bach_plus': "Population with Bachelor's Degree or Higher (%)"
         }
-        
-        # Create the plot
-        fig, ax = plt.subplots(figsize=(10, 6))
-        
-        # Create scatter plot with regression line
-        sns.regplot(
-            x=district_data[feature] / 1000,
-            y=district_data['Incident_Percentage(%)'],
-            ci=None,
-            scatter_kws={"s": 50},
-            line_kws={"color": "red"},
+
+        # Determine axis ranges with padding
+        x_min = district_data[f'{feature}_%'].min() * 0.9
+        x_max = district_data[f'{feature}_%'].max() * 1.1
+        y_min = district_data['Incident_Percentage(%)'].min() * 0.9
+        y_max = district_data['Incident_Percentage(%)'].max() * 1.1
+
+        # Create scatter plot
+        scatter = alt.Chart(district_data).mark_circle(
+            size=100,
+            opacity=0.7
+        ).encode(
+            x=alt.X(
+                f'{feature}_%:Q',
+                title=education_labels[feature],
+                scale=alt.Scale(domain=[x_min, x_max])
+            ),
+            y=alt.Y(
+                'Incident_Percentage(%):Q',
+                title='Illegal Pet Incident Percentage (%)',
+                scale=alt.Scale(domain=[y_min, y_max])
+            ),
+            tooltip=[
+                alt.Tooltip('Borough:N', title='Borough'),
+                alt.Tooltip(f'{feature}_%:Q', title=education_labels[feature], format='.1f'),
+                alt.Tooltip('Incident_Percentage(%):Q', title='Incident %', format='.1f')
+            ]
         )
 
-        # Add district names to each point
-        for i in range(len(district_data)):
-            plt.text(
-                x=district_data[feature].iloc[i] / 1000,
-                y=district_data['Incident_Percentage(%)'].iloc[i],
-                s=district_data['Borough'].iloc[i],
-                fontsize=10,
-                color="blue",
-                ha="right"
-            )
+        # Add text labels for boroughs
+        text = scatter.mark_text(
+            align='left',
+            baseline='middle',
+            dx=15,
+            fontSize=12
+        ).encode(
+            text='Borough:N'
+        )
 
-        # Add title and labels
-        plt.title(f"Regression: Illegal Pet Incident Percentage vs. {education_labels[feature]}", 
-                 fontsize=13)
-        plt.xlabel(education_labels[feature], fontsize=12)
-        plt.ylabel("Illegal Pet Incident Percentage(%)", fontsize=12)
-        plt.tight_layout()
-        
-        return fig
+        # Get the actual min and max of the x values (without padding)
+        x_min_actual = district_data[f'{feature}_%'].min()
+        x_max_actual = district_data[f'{feature}_%'].max()
+
+        # Add regression line with restricted domain
+        regression = scatter.transform_regression(
+            f'{feature}_%', 'Incident_Percentage(%)',
+            extent=[x_min_actual, x_max_actual]  # Add this line to restrict regression line
+        ).mark_line(
+            color='red',
+            strokeWidth=2
+        )
+
+        # Combine all layers
+        chart = (scatter + regression + text).properties(
+            width=800,
+            height=500,
+            title={
+                'text': f"Regression: Illegal Pet Incident Percentage vs. {education_labels[feature]}",
+                'fontSize': 16,
+                'anchor': 'middle'
+            }
+        ).configure_axis(
+            labelFontSize=12,
+            titleFontSize=14,
+            grid=True,
+            gridOpacity=0.2
+        ).configure_view(
+            strokeWidth=0
+        )
+
+        return chart
 
 app = App(app_ui, server)
