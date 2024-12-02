@@ -10,6 +10,7 @@ import pandas as pd
 import os
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import altair as alt
 ```
 
 # Import Illegal Pets Data and Education Attainment Data in NYC
@@ -23,9 +24,6 @@ education = pd.read_csv("Education Attainment/ACSST5Y2010.S1501-Data.csv")
 
 # Combine all education data from 2010 to 2022
 ```{python}
-import pandas as pd
-import os
-
 # Directory where all CSV files are stored
 directory = "Education Attainment"
 
@@ -185,30 +183,6 @@ print(merged_df.head())
 merged_df.to_csv("final_education_illegal_pets.csv", index=False)
 ```
 
-# Adding ZIP code
-```{python}
-# Load the shapefile
-shapefile_path = 'gz_2010_us_050_00_5m/gz_2010_us_050_00_5m.shp'
-gdf = gpd.read_file(shapefile_path)
-
-# List of GEO_IDs for NYC counties
-nyc_geo_ids = ["0500000US36005", "0500000US36047", "0500000US36061", "0500000US36081", "0500000US36085"]
-
-# Filter the GeoDataFrame
-nyc_gdf = gdf[gdf["GEO_ID"].isin(nyc_geo_ids)]
-
-# Display the result
-print(nyc_gdf)
-
-# Perform the merge
-nyc_gdf.rename(columns={"GEO_ID": "geo_id"}, inplace=True)
-result_gdf = nyc_gdf.merge(merged_df, on="geo_id", how="inner")
-
-# Display the merged GeoDataFrame
-print(result_gdf)
-print(merged_df)
-```
-
 # Load Map Data, drop NA and convert data type
 ```{python}
 # Load the GeoJSON file
@@ -229,9 +203,7 @@ Final Project Visualization
 
 # 1. Bar chart: types of illegal pets in NYC
 ```{python}
-
 # 1. Bar chart of types of illegal pets
-
 chart = alt.Chart(merged_df).mark_bar().encode(
     y=alt.Y('Descriptor:N', 
             sort='-x',  # Sort by count in descending order
@@ -304,7 +276,6 @@ final_chart
 
 # 3. Choropleth Map
 ```{python}
-import altair as alt
 import geopandas as gpd
 import pandas as pd
 import json
@@ -552,7 +523,6 @@ The analysis is limited by the small sample size, with only five boroughs, which
 
 # Conclusion
 Despite its limitations, this method offers a useful framework for understanding the relationship between educational attainment and illegal pet incidents in NYC. By normalizing data and employing regression analysis, the study provides insights that can inform policy decisions and highlight areas for further research. The visualizations effectively communicate complex data, making it accessible to a wider audience and supporting informed decision-making.
-
 
 ```{python}
 # 1. Download NYC borough boundaries GeoJSON
