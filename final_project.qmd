@@ -484,10 +484,17 @@ for feature, label in zip(
             alt.Tooltip(f'{feature}:Q', title=label), 
             alt.Tooltip('Incident_Percentage(%):Q', title='Incident %')
         ]
-    ).properties(
-        title=f"Regression: Illegal Pet Incident Percentage vs. {label}",
-        width=500,
-        height=400
+    )
+
+    # Add district names as text annotations
+    text_labels = alt.Chart(district_data).mark_text(
+        align='left',  
+        dx=7,   
+        fontSize=12   
+    ).encode(
+        x=alt.X(f'{feature}:Q'),
+        y=alt.Y('Incident_Percentage(%):Q'),
+        text='Borough'  
     )
 
     # Add regression line
@@ -496,10 +503,14 @@ for feature, label in zip(
     ).mark_line(color='red')
 
     # Combine scatter plot and regression line
-    combined_chart = chart + regression_line
+    combined_chart = chart + regression_line + text_labels
 
-    # Display the chart directly (no `.show()`)
-    display(combined_chart.configure_title(
+    # Display the chart directly
+    display(combined_chart.properties(
+        title=f"Regression: Illegal Pet Incident Percentage vs. {label}",
+        width=800,
+        height=400
+    ).configure_title(
         fontSize=16,
         anchor='middle'
     ).configure_axis(
