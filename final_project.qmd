@@ -10,10 +10,6 @@ import pandas as pd
 import os
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import seaborn as sns
-import folium
-from folium.plugins import HeatMap
-import altair as alt
 ```
 
 # Import Illegal Pets Data and Education Attainment Data in NYC
@@ -73,8 +69,6 @@ top_13_rows_f = top_13_rows_f.dropna(axis=1, how='all')
 ```
 
 # Select necessery variables
-We focus on educational attainment for individuals aged 25 and over, which is a common demographic for analyzing educational outcomes. By age 25, most individuals have completed their formal education, making it a relevant age group for assessing educational attainment.
-
 ```{python}
 # Cleaning Education Attainment Data
 # Rename selected columns for better readability
@@ -82,7 +76,6 @@ column_rename_map = {
     "GEO_ID": "geo_id",  # Geographic identifier
     "NAME": "area_name",  # Geographic area name
     "YEAR": "year",  # Year of data
-    "S1501_C01_001E": "total_population",  # Total population
     "S1501_C01_006E": "pop_25_plus",  # Population 25 years and over
     "S1501_C01_007E": "pop_25_less_9th",  # 25 years and over: Less than 9th grade
     "S1501_C01_009E": "pop_25_hs_grad",  # 25 years and over: High school graduate
@@ -106,7 +99,9 @@ edu_cleaned = filtered_df[filtered_df["geo_id"] != "Geographic Area Name"]
 # Adjust variables to accommodate different years' approaches to estimate (volume or percentage)
 # Transform year 2010 to year 2014's 'pop_25_less_9th' variable to be the result between 'pop_25_less_9th' and 'pop_25_plus'
 for year in range(2010, 2015):
-    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_less_9th'] = pd.to_numeric(edu_cleaned['pop_25_less_9th'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce')
+    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_less_9th'] = pd.to_numeric(edu_cleaned['pop_25_less_9th'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce') / 100
+    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_hs_grad'] = pd.to_numeric(edu_cleaned['pop_25_hs_grad'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce') / 100
+    edu_cleaned.loc[edu_cleaned['year'] == str(year), 'pop_25_bach_plus'] = pd.to_numeric(edu_cleaned['pop_25_bach_plus'], errors='coerce') * pd.to_numeric(edu_cleaned['pop_25_plus'], errors='coerce') / 100
 
 # Cleaning Illegal Pets Data
 # List of columns to drop
@@ -190,14 +185,35 @@ print(merged_df.head())
 merged_df.to_csv("final_education_illegal_pets.csv", index=False)
 ```
 
-# For final df name (merging education attainment, illegal pets), please refer to 'merged_df'
+# Adding ZIP code
+```{python}
+# Load the shapefile
+shapefile_path = 'gz_2010_us_050_00_5m/gz_2010_us_050_00_5m.shp'
+gdf = gpd.read_file(shapefile_path)
+
+# List of GEO_IDs for NYC counties
+nyc_geo_ids = ["0500000US36005", "0500000US36047", "0500000US36061", "0500000US36081", "0500000US36085"]
+
+# Filter the GeoDataFrame
+nyc_gdf = gdf[gdf["GEO_ID"].isin(nyc_geo_ids)]
+
+# Display the result
+print(nyc_gdf)
+
+# Perform the merge
+nyc_gdf.rename(columns={"GEO_ID": "geo_id"}, inplace=True)
+result_gdf = nyc_gdf.merge(merged_df, on="geo_id", how="inner")
+
+# Display the merged GeoDataFrame
+print(result_gdf)
+print(merged_df)
+```
 
 # Load Map Data, drop NA and convert data type
 ```{python}
 # Load the GeoJSON file
-geojson_path = '/Users/kohanchen/Documents/Fall 2024/student30538/problem_sets/final_project/final_project_group_14/Map_data/nyc-zips.geojson'
+geojson_path = 'nyc-zips.geojson'
 nyc_zips = gpd.read_file(geojson_path)
-merged_df = pd.read_csv("/Users/kohanchen/Documents/Fall 2024/student30538/problem_sets/final_project/final_project_group_14/final_education_illegal_pets.csv")
 
 # Drop rows with NaN ZIP codes or fill them with a placeholder
 merged_df = merged_df.dropna(subset=['Incident Zip'])
@@ -207,7 +223,6 @@ merged_df['Incident Zip'] = merged_df['Incident Zip'].apply(lambda x: str(int(x)
 
 # Ensure both columns are strings
 nyc_zips['postalCode'] = nyc_zips['postalCode'].astype(str)
-
 ```
 
 Final Project Visualization
