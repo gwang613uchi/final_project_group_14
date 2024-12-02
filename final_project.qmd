@@ -494,11 +494,23 @@ for feature, label in zip(
      "% Population with High School Graduation",
      "% Population with Bachelor's Degree or Higher"]
 ):
+    # Determine the min and max for the x-axis range with a little padding
+    x_min = district_data[feature].min() * 0.9  # 10% padding below min
+    x_max = district_data[feature].max() * 1.1  # 10% padding above max
+
     # Create Altair chart
     chart = alt.Chart(district_data).mark_point(filled=True, size=100).encode(
-        x=alt.X(f'{feature}:Q', title=label),
+        x=alt.X(
+            f'{feature}:Q', 
+            title=label, 
+            scale=alt.Scale(domain=[x_min, x_max])  # Dynamically set x-axis range
+        ),
         y=alt.Y('Incident_Percentage(%):Q', title="Illegal Pet Incident Percentage (%)"),
-        tooltip=['Borough', alt.Tooltip(f'{feature}:Q', title=label), alt.Tooltip('Incident_Percentage(%):Q', title='Incident %')]
+        tooltip=[
+            'Borough', 
+            alt.Tooltip(f'{feature}:Q', title=label), 
+            alt.Tooltip('Incident_Percentage(%):Q', title='Incident %')
+        ]
     ).properties(
         title=f"Regression: Illegal Pet Incident Percentage vs. {label}",
         width=800,
