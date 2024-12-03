@@ -439,15 +439,15 @@ education_data = merged_df.groupby('Borough')[
 district_data = pd.merge(incident_counts, education_data, on='Borough')
 
 # Calculate the percentage of each education level relative to the total population
-district_data['pop_25_less_9th_%'] = (district_data['pop_25_less_9th'] / district_data['pop_25_plus']) * 100
-district_data['pop_25_hs_grad_%'] = (district_data['pop_25_hs_grad'] / district_data['pop_25_plus']) * 100
-district_data['pop_25_bach_plus_%'] = (district_data['pop_25_bach_plus'] / district_data['pop_25_plus']) * 100
+district_data['pop_25_less_9th_percentage'] = (district_data['pop_25_less_9th'] / district_data['pop_25_plus']) * 100
+district_data['pop_25_hs_grad_percentage'] = (district_data['pop_25_hs_grad'] / district_data['pop_25_plus']) * 100
+district_data['pop_25_bach_plus_percentage'] = (district_data['pop_25_bach_plus'] / district_data['pop_25_plus']) * 100
 
 # Calculate incident percentage
 district_data['Incident_Percentage(%)'] = (district_data['Illegal_Pet_Incidents'] / district_data['pop_25_plus']) * 100
 
 # 3. Perform Regression: Using all education levels (as percentages) as predictors
-X = district_data[['pop_25_less_9th_%', 'pop_25_hs_grad_%', 'pop_25_bach_plus_%']]
+X = district_data[['pop_25_less_9th_percentage', 'pop_25_hs_grad_percentage', 'pop_25_bach_plus_percentage']]
 y = district_data['Incident_Percentage(%)']
 
 # Add a constant to the model (for the intercept)
@@ -462,7 +462,7 @@ import pandas as pd
 
 # Use Altair to create regression plots for each feature
 for feature, label in zip(
-    ['pop_25_less_9th_%', 'pop_25_hs_grad_%', 'pop_25_bach_plus_%'],
+    ['pop_25_less_9th_percentage', 'pop_25_hs_grad_percentage', 'pop_25_bach_plus_percentage'],
     ["% Population with Less than 9th Grade Education",
      "% Population with High School Graduation",
      "% Population with Bachelor's Degree or Higher"]
@@ -490,7 +490,7 @@ for feature, label in zip(
     text_labels = alt.Chart(district_data).mark_text(
         align='left',  
         dx=7,   
-        fontSize=12   
+        fontSize=8   
     ).encode(
         x=alt.X(f'{feature}:Q'),
         y=alt.Y('Incident_Percentage(%):Q'),
@@ -508,14 +508,14 @@ for feature, label in zip(
     # Display the chart directly
     display(combined_chart.properties(
         title=f"Regression: Illegal Pet Incident Percentage vs. {label}",
-        width=800,
+        width=600,
         height=400
     ).configure_title(
-        fontSize=16,
+        fontSize=10,
         anchor='middle'
     ).configure_axis(
-        labelFontSize=12,
-        titleFontSize=14
+        labelFontSize=8,
+        titleFontSize=10
     ))
     combined_chart.save(f"pictures/regression_plot_{feature}.png")
 ```
@@ -528,9 +528,7 @@ By normalizing incident counts per 10,000 people, the method ensures fair compar
 # Analysis of the Graphs
 The regression coefficients are very small, reflecting the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education shows a negative coefficient (-0.0466), high school graduation shows a slight negative relationship (-0.0335), and bachelor's degree shows a negative relationship (-0.0400).
 
-The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in thousands), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales. 
-
-These patterns, while statistically subtle, suggest that education levels have a minor influence on illegal pet ownership in NYC, though other factors likely play important roles in these relationships.
+The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in thousands), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales. These patterns, while statistically subtle, suggest that education levels have a minor influence on illegal pet ownership in NYC, though other factors likely play important roles in these relationships.
 
 # Limitations
 The analysis is limited by the small sample size, with only five boroughs, which reduces the statistical power and makes it difficult to draw definitive conclusions. The use of borough-level aggregation may mask important variations within boroughs, potentially overlooking localized trends.  Additionally, while the analysis identifies correlations between education levels and incident rates, it cannot establish causation. 

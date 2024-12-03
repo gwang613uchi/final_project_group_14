@@ -71,29 +71,29 @@ body {
 }
 
 h1 {
-    font-size: 16px;
-    margin-bottom: 8px;
-    margin-top: 10px;
+    font-size: 14px;
+    margin-bottom: 5px;
+    margin-top: 5px;
 }
 
 h2 {
     font-size: 14px;
-    margin-bottom: 6px;
-    margin-top: 8px;
+    margin-bottom: 3px;
+    margin-top: 3px;
 }
 
 p {
-    margin-bottom: 4px;
+    margin-bottom: 3px;
 }
 
 ul, ol {
-    margin-top: 4px;
-    margin-bottom: 4px;
+    margin-top: 3px;
+    margin-bottom: 3px;
     padding-left: 16px;
 }
 
 img {
-    width: 33%; 
+    width: 30%; 
     height: auto; 
 }
 
@@ -113,30 +113,22 @@ img {
 </section>
 <section id="data-sources-and-preparation" class="level1">
 <h1>Data Sources and Preparation</h1>
-<section id="illegal-pets-data" class="level2">
-<h2 class="anchored" data-anchor-id="illegal-pets-data">Illegal Pets Data</h2>
-<p>We used complaint records from NYC Open Data, focusing on incidents involving illegal animals kept as pets. The data was cleaned to remove irrelevant columns and standardized for borough-level analysis.</p>
-</section>
-<section id="education-attainment-data" class="level2">
-<h2 class="anchored" data-anchor-id="education-attainment-data">Education Attainment Data</h2>
-<p>Educational attainment data was collected from U.S. Census Bureau. Variables such as populations with less than 9th-grade education, high school graduates, and bachelor’s degrees were selected normalized to accommodate different measurements/definitions across years. For example, from 2010 to 2014, the Census Bureau used percentages to measure people with different levels of education attainment. However, since 2014, the measurement has been changed to the number of people.</p>
-</section>
+<p><strong>Illegal Pets Data:</strong> We used complaint records from NYC Open Data, focusing on incidents involving illegal animals kept as pets. They have multiple variables regarding each incident entry, such as address, ZIP code, animal type, agency name, status of incident, etc. The data was cleaned to remove irrelevant columns and standardized for borough-level analysis. <strong>Education Attainment Data:</strong> Educational attainment data was collected from U.S. Census Bureau. Variables such as populations with less than 9th-grade education, high school graduates, and bachelor’s degrees were selected normalized to accommodate different measurements/definitions across years. For example, from 2010 to 2014, the Census Bureau used percentages to measure people with different levels of education attainment. However, since 2014, the measurement has been changed to the number of people. This inconsistancy will be resolved later in the data cleaning and standardization process.</p>
 <section id="data-cleaning-and-standardization" class="level2">
 <h2 class="anchored" data-anchor-id="data-cleaning-and-standardization">Data Cleaning and Standardization</h2>
 <p>Key preprocessing steps included:</p>
 <ol type="1">
-<li><strong>Combining Education Data</strong>: Merging annual education datasets (2010–2022) and reconciling variable definitions for consistency.</li>
-<li><strong>Standardizing Names</strong>: Mapping borough and county names for alignment across datasets.</li>
-<li><strong>Time Variable Adjustment</strong>: Ensuring time variables matched between datasets for effective merging.</li>
-<li><strong>Normalizing inccident counts per 10,000 people</strong>:</li>
+<li><strong>Combining Education Data</strong>: Merging annual education datasets (2010–2022) trhough for loop and reconciling variable definitions for consistency by manually checking each year definition by selecting top 13 rows of the merged dataframe.</li>
+<li><strong>Standardizing Names and Education Attainment</strong>: Mapping borough and county names for alignment across datasets. Transforming all education attainment (population above 25 years old) measurements into numbers of populatin, instead of percentages, by multiplying the population over 25 and the percentage of each year.</li>
+<li><strong>Time Variable Adjustment</strong>: Ensuring time variables matched between datasets for effective merging by transforming illegal pets data time variable to year format because we need to combine it with education data that only has time variable in time.</li>
+<li><strong>Normalizing Inccident Counts Per 10,000 People</strong>: This method normalizes incident counts by population size, allowing fair comparisons across boroughs. For example, Staten Island that has relatively low population may have lower illegal pets iccidents, while Brooklyn with high population may have more inccidents. This nature makes it unfair to compared the ccident count directly. Thus, we also normalize incident counts per 10,000 people in each borough. By normalizing incident counts per 10,000 people, the method ensures fair comparisons across boroughs with different population sizes.</li>
 </ol>
-<p>This method normalizes incident counts by population size, allowing fair comparisons across boroughs. For example, Staten Island that has relatively low population may have lower illegal pets iccidents, while Brooklyn with high population may have more inccidents. This nature makes it unfair to compared the ccident count directly. Thus, we also normalize incident counts per 10,000 people in each borough.</p>
-<p>By normalizing incident counts per 10,000 people, the method ensures fair comparisons across boroughs with different population sizes. Regression analysis quantifies the relationship between education levels and incident rates, providing insights into potential trends. Visualizations, such as scatter plots, make these relationships accessible, helping to identify patterns and inform decision-making. The eventual merged dataset, named “final_education_illegal_pets.csv”, provided borough-level insights into illegal pet incidents and corresponding education attainment levels.</p>
 <hr>
 </section>
 </section>
 <section id="visualization-and-regression-models" class="level1">
 <h1>Visualization and Regression Models</h1>
+<p>We used altair package to build visualizations to make these relationships accessible, helping to identify patterns and inform decision-making. The eventual merged dataset, named “final_education_illegal_pets.csv”, provided borough-level insights into illegal pet incidents and corresponding education attainment levels. We also built regression analysis that quantifies the relationship between education levels and incident rates to provide insights into potential trends.</p>
 <p><strong>Bar Chart: Types of Illegal Pets in NYC</strong><br>
 A bar chart visualizes the frequency of illegal pet types, revealing that roosters dominate the list of incidents.</p>
 <p><strong>Pie Chart: Borough-Wise Distribution</strong><br>
@@ -150,26 +142,32 @@ The choropleth map presents ZIP-level variability in complaints, showing dense c
 <p><br><br><br> <img src="pictures/bar_chart_types_of_illegal_pets.png" class="img-fluid" style="width:40.0%"> <img src="pictures/pie_chart_incidents_by_borough.png" class="img-fluid" style="width:40.0%"> <br><br><br> <img src="pictures/bar_plot_education_levels_by_district.png" class="img-fluid" style="width:40.0%"> <img src="pictures/line_plot_education_levels.png" class="img-fluid" style="width:40.0%"> <img src="pictures/choropleth_map_illegal_pets.png" class="img-fluid" style="width:40.0%"> <br><br><br></p>
 <section id="regression-models" class="level2">
 <h2 class="anchored" data-anchor-id="regression-models">Regression Models</h2>
-<p>Regression analysis helps identify relationships between education levels as percentages and incident rates, while visualization makes these patterns clear.</p>
-<p><img src="pictures/regression_plot_pop_25_less_9th.png" class="img-fluid" alt="Regression Plot: Population with Less than 9th Grade"> <img src="pictures/regression_plot_pop_25_hs_grad.png" class="img-fluid" alt="Regression Plot: High School Graduates"> <img src="pictures/regression_plot_pop_25_bach_plus.png" class="img-fluid" alt="Regression Plot: Bachelor’s Degree or Higher"></p>
+<p>Regression analysis helps identify relationships between education levels as percentages and incident rates. Among each level of education attainment, we performed Ordinary Least Squares regression, using all education levels (as percentages) as predictors. Different cities were labeled in the graph as well to represent their unqiue education level and illegal pet incident rate. The overall model was represented by the red line in each graph to show a general trend between each education level in percentage and illegal pet incident.</p>
+<p><img src="pictures/regression_plot_pop_25_less_9th_percentage.png" class="img-fluid" alt="Regression Plot: Population with Less than 9th Grade"> <img src="pictures/regression_plot_pop_25_hs_grad_percentage.png" class="img-fluid" alt="Regression Plot: High School Graduates"> <img src="pictures/regression_plot_pop_25_bach_plus_percentage.png" class="img-fluid" alt="Regression Plot: Bachelor’s Degree or Higher"></p>
+</section>
+<section id="shiny-app" class="level2">
+<h2 class="anchored" data-anchor-id="shiny-app">Shiny App</h2>
+<div class="clearfix">
+<p><img src="pictures/shiny_app_display.png" class="img-fluid" style="float: right; margin: 0 0 10px 10px; width: 50%;"></p>
+<p>We built shiny-based application to provide insights into illegal pet incidents in New York City by offering three key visualizations: a choropleth map highlighting incident density across ZIP codes, a line chart of education levels over time, and a correlation plot examining the relationship between education attainment and incident rates. Through switching toggle and checkbox, users can interactively filter data by selecting specific years, year ranges, or education levels, allowing users to observe the spatial and socioeconomic factors influencing illegal pet incidents.</p>
+</div>
 <hr>
 </section>
 </section>
 <section id="key-findings" class="level1">
 <h1>Key Findings</h1>
 <ol type="1">
-<li><strong>Minimal Influence of Education</strong>: Regression analysis revealed weak correlations between education levels and illegal pet ownership.</li>
+<li><strong>Minimal Influence of Education</strong>: Regression analysis revealed weak correlations between education attainment in percentageand illegal pet ownership.</li>
 <li><strong>Borough Variability</strong>: The Bronx exhibited higher-than-predicted incident rates, indicating the need for targeted policy interventions.</li>
 <li><strong>Spatial Clusters</strong>: ZIP-level analysis highlighted areas with disproportionately high complaint frequencies.</li>
 </ol>
-<p>Results indicated that education levels in percentagehad minor influences, with coefficients for all variables being statistically small. It reflects the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education shows a negative coefficient (-0.0466), high school graduation shows a slight negative relationship (-0.0335), and bachelor’s degree shows a negative relationship (-0.0400).</p>
-<p>The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in thousands), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales.</p>
-<p>These patterns, while statistically subtle, suggest that education levels have a minor influence on illegal pet ownership in NYC, though other factors likely play important roles in these relationships.</p>
+<p>Results indicated that education levels in percentage had minor influences, with coefficients for all variables being statistically small. It reflects the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education percentage shows a negative coefficient (-0.0466), high school graduation shows a slight negative relationship (-0.0335), and bachelor’s degree shows a negative relationship (-0.0400).</p>
+<p>The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in percentage), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales. These patterns, while statistically subtle, suggest that education levels percentage have a minor influence on illegal pet ownership in NYC, though other factors likely play important roles in these relationships.</p>
 <hr>
 </section>
 <section id="limitations" class="level1">
 <h1>Limitations</h1>
-<p>The analysis is limited by the small sample size, with only five boroughs, which reduces the statistical power and makes it difficult to draw definitive conclusions. The use of borough-level aggregation may mask important variations within boroughs, potentially overlooking localized trends. Additionally, while the analysis identifies correlations between education levels and incident rates, it cannot establish causation. There are many factors potentially contributing to illegal pets incidents, which are out of the scope of this project due to time and funding limits.</p>
+<p>Due to the limitation of time, we only consider illegal pets incidents and education attainment in NYC. The analysis is limited by the small sample size, with only five boroughs, which reduces the statistical power and makes it difficult to draw definitive conclusions. The use of borough-level aggregation may mask important variations within boroughs, potentially overlooking localized trends. Additionally, while the analysis identifies correlations between education levels percentage and incident rates, it cannot establish causation. In addition, this study focus population above 25 years old (due to the missing data from previous years) which may not be representative enough to demonstrate the relationship between illegal pets ownership adn education attaiment among all groups of people. Finally, there are many factors potentially contributing to illegal pets incidents, which are out of the scope of this project due to time and funding limits.</p>
 <hr>
 </section>
 <section id="policy-implications" class="level1">
@@ -179,7 +177,7 @@ The choropleth map presents ZIP-level variability in complaints, showing dense c
 <li><strong>Enhanced Enforcement</strong>: Strengthening monitoring and reporting mechanisms in areas with dense complaint clusters.</li>
 <li><strong>Broader Socioeconomic Analysis</strong>: Exploring additional factors such as income levels, housing conditions, and cultural influences.</li>
 </ol>
-<p>Despite its limitations, this method offers a useful framework for understanding the relationship between educational attainment and illegal pet incidents in NYC. By normalizing data and employing regression analysis, the study provides insights that can inform policy decisions and highlight areas for further research. The visualizations effectively communicate complex data, making it accessible to a wider audience and supporting informed decision-making.</p>
+<p>Despite its limitations, this method offers a useful framework for understanding the relationship between educational attainment percentage and illegal pet incidents in NYC. By normalizing data and employing regression analysis, the study provides insights that can inform policy decisions and highlight areas for further research. The visualizations effectively communicate complex data, making it accessible to a wider audience and supporting informed decision-making.</p>
 <hr>
 </section>
 <section id="future-directions" class="level1">
