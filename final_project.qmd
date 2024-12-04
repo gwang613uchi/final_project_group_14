@@ -508,7 +508,7 @@ for feature, label in zip(
     # Display the chart directly
     display(combined_chart.properties(
         title=f"Regression: Illegal Pet Incident Percentage vs. {label}",
-        width=600,
+        width=800,
         height=400
     ).configure_title(
         fontSize=10,

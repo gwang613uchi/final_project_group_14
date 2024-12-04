@@ -101,7 +101,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="import-packages" class="level1">
 <h1>Import Packages</h1>
-<div id="f9391f80" class="cell" data-execution_count="1">
+<div id="d3970735" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
@@ -111,7 +111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="import-illegal-pets-data-and-education-attainment-data-in-nyc" class="level1">
 <h1>Import Illegal Pets Data and Education Attainment Data in NYC</h1>
-<div id="6b3f1ee3" class="cell" data-execution_count="2">
+<div id="9e34e896" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Illegal Pets Data</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>illegal_pets <span class="op">=</span> pd.read_csv(<span class="st">"data/Illegal Pets/illegal_animals_kept_as_pets_20241116.csv"</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -121,7 +121,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="combine-all-education-data-from-2010-to-2022" class="level1">
 <h1>Combine all education data from 2010 to 2022</h1>
-<div id="fcca1dcb" class="cell" data-execution_count="3">
+<div id="68a52fb3" class="cell" data-execution_count="3">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Directory where all CSV files are stored</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>directory <span class="op">=</span> <span class="st">"data/Education Attainment"</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -151,7 +151,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="anayze-meanings-of-variables" class="level1">
 <h1>Anayze meanings of variables</h1>
 <p>Each year’s dataset’s variable has different interpretation, so it it critical to firstly select the most relevant variable for futher analysis. In our project, we only select total estimate to simplify our anlysis without considering gender and earning. For example, S1501_C01_015’s definition has changed in 2018 from ‘percent of bachelor degree or higher’ to ‘total population of bachelor degreee or higher.’ Thus, we have to manually clean these messy variables.</p>
-<div id="1587da04" class="cell" data-execution_count="4">
+<div id="8ada0c36" class="cell" data-execution_count="4">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Select the top 13 rows (containing each years variable definition) to analyze vairbales meaning</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>top_13_rows <span class="op">=</span> sorted_df.head(<span class="dv">13</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -167,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="select-necessery-variables" class="level1">
 <h1>Select necessery variables</h1>
-<div id="958f5da8" class="cell" data-execution_count="5">
+<div id="4a3c71db" class="cell" data-execution_count="5">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cleaning Education Attainment Data</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Rename selected columns for better readability</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>column_rename_map <span class="op">=</span> {</span>
@@ -214,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop the specified columns</span></span>
 <span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>illegal_pets <span class="op">=</span> illegal_pets.drop(columns<span class="op">=</span>columns_to_drop, errors<span class="op">=</span><span class="st">'ignore'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_21084/2495111871.py:22: SettingWithCopyWarning:
+<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_34511/2495111871.py:22: SettingWithCopyWarning:
 
 
 A value is trying to be set on a copy of a slice from a DataFrame
@@ -226,7 +226,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="standardization-of-county-name" class="level1">
 <h1>Standardization of County Name</h1>
-<div id="eaffc667" class="cell" data-execution_count="6">
+<div id="26e65be8" class="cell" data-execution_count="6">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Exam unqiue values in both dataframes for furthern merging</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(edu_cleaned[<span class="st">'area_name'</span>].unique())</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -309,7 +309,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 ['The Bronx' 'Kings' 'New York' 'Queens' 'Staten Island']</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_21084/2301969997.py:26: SettingWithCopyWarning:
+<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_34511/2301969997.py:26: SettingWithCopyWarning:
 
 
 A value is trying to be set on a copy of a slice from a DataFrame.
@@ -322,12 +322,12 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="standardization-time-variable" class="level1">
 <h1>Standardization Time Variable</h1>
-<div id="d1a85df8" class="cell" data-execution_count="7">
+<div id="13ffb11c" class="cell" data-execution_count="7">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Format both columns as strings</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>illegal_pets[<span class="st">'year'</span>] <span class="op">=</span> pd.to_datetime(illegal_pets[<span class="st">'Created Date'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>).dt.strftime(<span class="st">'%Y'</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>edu_nyc[<span class="st">'year'</span>] <span class="op">=</span> pd.to_datetime(edu_nyc[<span class="st">'year'</span>], errors<span class="op">=</span><span class="st">'coerce'</span>).dt.strftime(<span class="st">'%Y'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_21084/3968184602.py:3: SettingWithCopyWarning:
+<pre><code>/var/folders/k2/prgbv7z97knbd104r93pncfc0000gp/T/ipykernel_34511/3968184602.py:3: SettingWithCopyWarning:
 
 
 A value is trying to be set on a copy of a slice from a DataFrame.
@@ -340,7 +340,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="merging" class="level1">
 <h1>Merging</h1>
-<div id="5479fbe1" class="cell" data-execution_count="8">
+<div id="434d464b" class="cell" data-execution_count="8">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Drop 2023 and 2024 because education data does not includes these years</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>illegal_pets <span class="op">=</span> illegal_pets[<span class="op">~</span>illegal_pets[<span class="st">'year'</span>].isin([<span class="st">'2023'</span>, <span class="st">'2024'</span>])]</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -392,7 +392,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="load-map-data-drop-na-and-convert-data-type" class="level1">
 <h1>Load Map Data, drop NA and convert data type</h1>
-<div id="de6931b8" class="cell" data-execution_count="9">
+<div id="2041d0f4" class="cell" data-execution_count="9">
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load the GeoJSON file</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>geojson_path <span class="op">=</span> <span class="st">'nyc-zips.geojson'</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>nyc_zips <span class="op">=</span> gpd.read_file(geojson_path)</span>
@@ -410,7 +410,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="bar-chart-types-of-illegal-pets-in-nyc" class="level1">
 <h1>1. Bar chart: types of illegal pets in NYC</h1>
-<div id="e73cd4b8" class="cell" data-execution_count="10">
+<div id="d70f572b" class="cell" data-execution_count="10">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Bar chart of types of illegal pets</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>chart <span class="op">=</span> alt.Chart(merged_df).mark_bar().encode(</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    y<span class="op">=</span>alt.Y(<span class="st">'Descriptor:N'</span>, </span>
@@ -437,7 +437,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="pie-chart-of-incidents-across-boroughs" class="level1">
 <h1>2. Pie chart of incidents across boroughs</h1>
-<div id="b4341aa8" class="cell" data-execution_count="11">
+<div id="48584863" class="cell" data-execution_count="11">
 <div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate percentages and create pie chart with labels</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>total <span class="op">=</span> <span class="bu">len</span>(merged_df)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>df_with_pct <span class="op">=</span> merged_df.assign(</span>
@@ -487,7 +487,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="choropleth-map" class="level1">
 <h1>3. Choropleth Map</h1>
-<div id="48c6d615" class="cell" data-execution_count="12">
+<div id="9526738a" class="cell" data-execution_count="12">
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
@@ -536,7 +536,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="line-plot-different-education-level-over-time" class="level1">
 <h1>4. Line Plot: Different education level over time</h1>
-<div id="35b6c4f1" class="cell" data-execution_count="13">
+<div id="d40bf12b" class="cell" data-execution_count="13">
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare the data (keeping the same data preparation steps)</span></span>
@@ -579,23 +579,23 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <div class="cell-output cell-output-display" data-execution_count="13">
 
 <style>
-  #altair-viz-dbe534e78b104f998ec99cb2403be4bf.vega-embed {
+  #altair-viz-f215f992f5bf4f40a06caf4c20be76ae.vega-embed {
     width: 100%;
     display: flex;
   }
 
-  #altair-viz-dbe534e78b104f998ec99cb2403be4bf.vega-embed details,
-  #altair-viz-dbe534e78b104f998ec99cb2403be4bf.vega-embed details summary {
+  #altair-viz-f215f992f5bf4f40a06caf4c20be76ae.vega-embed details,
+  #altair-viz-f215f992f5bf4f40a06caf4c20be76ae.vega-embed details summary {
     position: relative;
   }
 </style>
-<div id="altair-viz-dbe534e78b104f998ec99cb2403be4bf"></div>
+<div id="altair-viz-f215f992f5bf4f40a06caf4c20be76ae"></div>
 <script type="text/javascript">
   var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
   (function(spec, embedOpt){
     let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-dbe534e78b104f998ec99cb2403be4bf") {
-      outputDiv = document.getElementById("altair-viz-dbe534e78b104f998ec99cb2403be4bf");
+    if (outputDiv.id !== "altair-viz-f215f992f5bf4f40a06caf4c20be76ae") {
+      outputDiv = document.getElementById("altair-viz-f215f992f5bf4f40a06caf4c20be76ae");
     }
     const paths = {
       "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
@@ -648,7 +648,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="bar-plot-different-education-level-by-districts" class="level1">
 <h1>5. Bar Plot: Different education level by districts</h1>
-<div id="ca10fb54" class="cell" data-execution_count="14">
+<div id="0c8b3c46" class="cell" data-execution_count="14">
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> altair <span class="im">as</span> alt</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -696,23 +696,23 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <div class="cell-output cell-output-display" data-execution_count="14">
 
 <style>
-  #altair-viz-f96435d3436d42c2939bf97f938f4a1e.vega-embed {
+  #altair-viz-2078c718692c4c4f8829986ba66d638c.vega-embed {
     width: 100%;
     display: flex;
   }
 
-  #altair-viz-f96435d3436d42c2939bf97f938f4a1e.vega-embed details,
-  #altair-viz-f96435d3436d42c2939bf97f938f4a1e.vega-embed details summary {
+  #altair-viz-2078c718692c4c4f8829986ba66d638c.vega-embed details,
+  #altair-viz-2078c718692c4c4f8829986ba66d638c.vega-embed details summary {
     position: relative;
   }
 </style>
-<div id="altair-viz-f96435d3436d42c2939bf97f938f4a1e"></div>
+<div id="altair-viz-2078c718692c4c4f8829986ba66d638c"></div>
 <script type="text/javascript">
   var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
   (function(spec, embedOpt){
     let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-f96435d3436d42c2939bf97f938f4a1e") {
-      outputDiv = document.getElementById("altair-viz-f96435d3436d42c2939bf97f938f4a1e");
+    if (outputDiv.id !== "altair-viz-2078c718692c4c4f8829986ba66d638c") {
+      outputDiv = document.getElementById("altair-viz-2078c718692c4c4f8829986ba66d638c");
     }
     const paths = {
       "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
@@ -765,7 +765,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="correlation-analysis" class="level1">
 <h1>6. Correlation Analysis</h1>
-<div id="ce5124cb" class="cell" data-execution_count="15">
+<div id="3d429dbc" class="cell" data-execution_count="15">
 <div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -857,7 +857,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 <span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Display the chart directly</span></span>
 <span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a>    display(combined_chart.properties(</span>
 <span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a>        title<span class="op">=</span><span class="ss">f"Regression: Illegal Pet Incident Percentage vs. </span><span class="sc">{</span>label<span class="sc">}</span><span class="ss">"</span>,</span>
-<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a>        width<span class="op">=</span><span class="dv">600</span>,</span>
+<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a>        width<span class="op">=</span><span class="dv">800</span>,</span>
 <span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a>        height<span class="op">=</span><span class="dv">400</span></span>
 <span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a>    ).configure_title(</span>
 <span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a>        fontSize<span class="op">=</span><span class="dv">10</span>,</span>
@@ -873,8 +873,8 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 Dep. Variable:     Incident_Percentage(%)   R-squared:                       0.999
 Model:                                OLS   Adj. R-squared:                  0.997
 Method:                     Least Squares   F-statistic:                     474.2
-Date:                    Mon, 02 Dec 2024   Prob (F-statistic):             0.0337
-Time:                            17:42:23   Log-Likelihood:                 27.108
+Date:                    Tue, 03 Dec 2024   Prob (F-statistic):             0.0337
+Time:                            16:44:59   Log-Likelihood:                 27.108
 No. Observations:                       5   AIC:                            -46.22
 Df Residuals:                           1   BIC:                            -47.78
 Df Model:                               3                                         
@@ -907,23 +907,23 @@ omni_normtest is not valid with less than 8 observations; 5 samples were given.
 <div class="cell-output cell-output-display">
 
 <style>
-  #altair-viz-50de02bc05d3490c820b401c196ddf55.vega-embed {
+  #altair-viz-cda97fed999244aeaa8560e586684777.vega-embed {
     width: 100%;
     display: flex;
   }
 
-  #altair-viz-50de02bc05d3490c820b401c196ddf55.vega-embed details,
-  #altair-viz-50de02bc05d3490c820b401c196ddf55.vega-embed details summary {
+  #altair-viz-cda97fed999244aeaa8560e586684777.vega-embed details,
+  #altair-viz-cda97fed999244aeaa8560e586684777.vega-embed details summary {
     position: relative;
   }
 </style>
-<div id="altair-viz-50de02bc05d3490c820b401c196ddf55"></div>
+<div id="altair-viz-cda97fed999244aeaa8560e586684777"></div>
 <script type="text/javascript">
   var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
   (function(spec, embedOpt){
     let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-50de02bc05d3490c820b401c196ddf55") {
-      outputDiv = document.getElementById("altair-viz-50de02bc05d3490c820b401c196ddf55");
+    if (outputDiv.id !== "altair-viz-cda97fed999244aeaa8560e586684777") {
+      outputDiv = document.getElementById("altair-viz-cda97fed999244aeaa8560e586684777");
     }
     const paths = {
       "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
@@ -969,29 +969,29 @@ omni_normtest is not valid with less than 8 observations; 5 samples were given.
         .catch(showError)
         .then(() => displayChart(vegaEmbed));
     }
-  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "axis": {"labelFontSize": 8, "titleFontSize": 10}, "title": {"anchor": "middle", "fontSize": 10}}, "layer": [{"mark": {"type": "point", "filled": true, "size": 100}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_less_9th_percentage", "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_less_9th_percentage", "scale": {"domain": [4.4477569225930145, 15.386643155165679]}, "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}}, {"mark": {"type": "line", "color": "red"}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_less_9th_percentage", "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_less_9th_percentage", "scale": {"domain": [4.4477569225930145, 15.386643155165679]}, "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}, "transform": [{"on": "pop_25_less_9th_percentage", "regression": "Incident_Percentage(%)"}]}, {"mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8}, "encoding": {"text": {"field": "Borough", "type": "nominal"}, "x": {"field": "pop_25_less_9th_percentage", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "type": "quantitative"}}}], "data": {"name": "data-002e6f22a1ae82cf6ff653a0c6fa7ea3"}, "height": 400, "title": "Regression: Illegal Pet Incident Percentage vs. % Population with Less than 9th Grade Education", "width": 600, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-002e6f22a1ae82cf6ff653a0c6fa7ea3": [{"Borough": "BRONX", "Illegal_Pet_Incidents": 721, "pop_25_less_9th": 127254.37082662967, "pop_25_hs_grad": 252696.97821636614, "pop_25_bach_plus": 63837.08046047157, "pop_25_plus": 909748.841886269, "pop_25_less_9th_percentage": 13.98785741378698, "pop_25_hs_grad_percentage": 27.776564979453607, "pop_25_bach_plus_percentage": 7.017000464448195, "Incident_Percentage(%)": 0.07925264279590419}, {"Borough": "BROOKLYN", "Illegal_Pet_Incidents": 1123, "pop_25_less_9th": 169427.7116099733, "pop_25_hs_grad": 459542.2223829029, "pop_25_bach_plus": 240791.617856634, "pop_25_plus": 1752126.3633125557, "pop_25_less_9th_percentage": 9.669834046081851, "pop_25_hs_grad_percentage": 26.227687226513513, "pop_25_bach_plus_percentage": 13.742822601070584, "Incident_Percentage(%)": 0.06409355075719912}, {"Borough": "MANHATTAN", "Illegal_Pet_Incidents": 359, "pop_25_less_9th": 87347.31473259053, "pop_25_hs_grad": 154754.67435933146, "pop_25_bach_plus": 359791.4083537605, "pop_25_plus": 1235758.1058495822, "pop_25_less_9th_percentage": 7.068318169965744, "pop_25_hs_grad_percentage": 12.523055574289582, "pop_25_bach_plus_percentage": 29.11503526868669, "Incident_Percentage(%)": 0.029050992933053667}, {"Borough": "QUEENS", "Illegal_Pet_Incidents": 1236, "pop_25_less_9th": 169404.0695331715, "pop_25_hs_grad": 445569.1017605178, "pop_25_bach_plus": 196663.5854595469, "pop_25_plus": 1645685.0323624595, "pop_25_less_9th_percentage": 10.293833036202795, "pop_25_hs_grad_percentage": 27.074992662531667, "pop_25_bach_plus_percentage": 11.950256676833655, "Incident_Percentage(%)": 0.07510550170257446}, {"Borough": "STATEN ISLAND", "Illegal_Pet_Incidents": 502, "pop_25_less_9th": 16258.73644621514, "pop_25_hs_grad": 101942.72079083665, "pop_25_bach_plus": 42849.68419521912, "pop_25_plus": 328994.2111553785, "pop_25_less_9th_percentage": 4.941952136214461, "pop_25_hs_grad_percentage": 30.986174629890616, "pop_25_bach_plus_percentage": 13.024449288860565, "Incident_Percentage(%)": 0.1525862714231509}]}}, {"mode": "vega-lite"});
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "axis": {"labelFontSize": 8, "titleFontSize": 10}, "title": {"anchor": "middle", "fontSize": 10}}, "layer": [{"mark": {"type": "point", "filled": true, "size": 100}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_less_9th_percentage", "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_less_9th_percentage", "scale": {"domain": [4.4477569225930145, 15.386643155165679]}, "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}}, {"mark": {"type": "line", "color": "red"}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_less_9th_percentage", "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_less_9th_percentage", "scale": {"domain": [4.4477569225930145, 15.386643155165679]}, "title": "% Population with Less than 9th Grade Education", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}, "transform": [{"on": "pop_25_less_9th_percentage", "regression": "Incident_Percentage(%)"}]}, {"mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8}, "encoding": {"text": {"field": "Borough", "type": "nominal"}, "x": {"field": "pop_25_less_9th_percentage", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "type": "quantitative"}}}], "data": {"name": "data-002e6f22a1ae82cf6ff653a0c6fa7ea3"}, "height": 400, "title": "Regression: Illegal Pet Incident Percentage vs. % Population with Less than 9th Grade Education", "width": 800, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-002e6f22a1ae82cf6ff653a0c6fa7ea3": [{"Borough": "BRONX", "Illegal_Pet_Incidents": 721, "pop_25_less_9th": 127254.37082662967, "pop_25_hs_grad": 252696.97821636614, "pop_25_bach_plus": 63837.08046047157, "pop_25_plus": 909748.841886269, "pop_25_less_9th_percentage": 13.98785741378698, "pop_25_hs_grad_percentage": 27.776564979453607, "pop_25_bach_plus_percentage": 7.017000464448195, "Incident_Percentage(%)": 0.07925264279590419}, {"Borough": "BROOKLYN", "Illegal_Pet_Incidents": 1123, "pop_25_less_9th": 169427.7116099733, "pop_25_hs_grad": 459542.2223829029, "pop_25_bach_plus": 240791.617856634, "pop_25_plus": 1752126.3633125557, "pop_25_less_9th_percentage": 9.669834046081851, "pop_25_hs_grad_percentage": 26.227687226513513, "pop_25_bach_plus_percentage": 13.742822601070584, "Incident_Percentage(%)": 0.06409355075719912}, {"Borough": "MANHATTAN", "Illegal_Pet_Incidents": 359, "pop_25_less_9th": 87347.31473259053, "pop_25_hs_grad": 154754.67435933146, "pop_25_bach_plus": 359791.4083537605, "pop_25_plus": 1235758.1058495822, "pop_25_less_9th_percentage": 7.068318169965744, "pop_25_hs_grad_percentage": 12.523055574289582, "pop_25_bach_plus_percentage": 29.11503526868669, "Incident_Percentage(%)": 0.029050992933053667}, {"Borough": "QUEENS", "Illegal_Pet_Incidents": 1236, "pop_25_less_9th": 169404.0695331715, "pop_25_hs_grad": 445569.1017605178, "pop_25_bach_plus": 196663.5854595469, "pop_25_plus": 1645685.0323624595, "pop_25_less_9th_percentage": 10.293833036202795, "pop_25_hs_grad_percentage": 27.074992662531667, "pop_25_bach_plus_percentage": 11.950256676833655, "Incident_Percentage(%)": 0.07510550170257446}, {"Borough": "STATEN ISLAND", "Illegal_Pet_Incidents": 502, "pop_25_less_9th": 16258.73644621514, "pop_25_hs_grad": 101942.72079083665, "pop_25_bach_plus": 42849.68419521912, "pop_25_plus": 328994.2111553785, "pop_25_less_9th_percentage": 4.941952136214461, "pop_25_hs_grad_percentage": 30.986174629890616, "pop_25_bach_plus_percentage": 13.024449288860565, "Incident_Percentage(%)": 0.1525862714231509}]}}, {"mode": "vega-lite"});
 </script>
 </div>
 <div class="cell-output cell-output-display">
 
 <style>
-  #altair-viz-6db51998ef0140fc902be8d41c936ba4.vega-embed {
+  #altair-viz-6f28ae463aad47c58de8f66a62a2ee80.vega-embed {
     width: 100%;
     display: flex;
   }
 
-  #altair-viz-6db51998ef0140fc902be8d41c936ba4.vega-embed details,
-  #altair-viz-6db51998ef0140fc902be8d41c936ba4.vega-embed details summary {
+  #altair-viz-6f28ae463aad47c58de8f66a62a2ee80.vega-embed details,
+  #altair-viz-6f28ae463aad47c58de8f66a62a2ee80.vega-embed details summary {
     position: relative;
   }
 </style>
-<div id="altair-viz-6db51998ef0140fc902be8d41c936ba4"></div>
+<div id="altair-viz-6f28ae463aad47c58de8f66a62a2ee80"></div>
 <script type="text/javascript">
   var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
   (function(spec, embedOpt){
     let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-6db51998ef0140fc902be8d41c936ba4") {
-      outputDiv = document.getElementById("altair-viz-6db51998ef0140fc902be8d41c936ba4");
+    if (outputDiv.id !== "altair-viz-6f28ae463aad47c58de8f66a62a2ee80") {
+      outputDiv = document.getElementById("altair-viz-6f28ae463aad47c58de8f66a62a2ee80");
     }
     const paths = {
       "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
@@ -1037,29 +1037,29 @@ omni_normtest is not valid with less than 8 observations; 5 samples were given.
         .catch(showError)
         .then(() => displayChart(vegaEmbed));
     }
-  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "axis": {"labelFontSize": 8, "titleFontSize": 10}, "title": {"anchor": "middle", "fontSize": 10}}, "layer": [{"mark": {"type": "point", "filled": true, "size": 100}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_hs_grad_percentage", "title": "% Population with High School Graduation", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_hs_grad_percentage", "scale": {"domain": [11.270750016860624, 34.08479209287968]}, "title": "% Population with High School Graduation", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}}, {"mark": {"type": "line", "color": "red"}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_hs_grad_percentage", "title": "% Population with High School Graduation", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_hs_grad_percentage", "scale": {"domain": [11.270750016860624, 34.08479209287968]}, "title": "% Population with High School Graduation", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}, "transform": [{"on": "pop_25_hs_grad_percentage", "regression": "Incident_Percentage(%)"}]}, {"mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8}, "encoding": {"text": {"field": "Borough", "type": "nominal"}, "x": {"field": "pop_25_hs_grad_percentage", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "type": "quantitative"}}}], "data": {"name": "data-002e6f22a1ae82cf6ff653a0c6fa7ea3"}, "height": 400, "title": "Regression: Illegal Pet Incident Percentage vs. % Population with High School Graduation", "width": 600, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-002e6f22a1ae82cf6ff653a0c6fa7ea3": [{"Borough": "BRONX", "Illegal_Pet_Incidents": 721, "pop_25_less_9th": 127254.37082662967, "pop_25_hs_grad": 252696.97821636614, "pop_25_bach_plus": 63837.08046047157, "pop_25_plus": 909748.841886269, "pop_25_less_9th_percentage": 13.98785741378698, "pop_25_hs_grad_percentage": 27.776564979453607, "pop_25_bach_plus_percentage": 7.017000464448195, "Incident_Percentage(%)": 0.07925264279590419}, {"Borough": "BROOKLYN", "Illegal_Pet_Incidents": 1123, "pop_25_less_9th": 169427.7116099733, "pop_25_hs_grad": 459542.2223829029, "pop_25_bach_plus": 240791.617856634, "pop_25_plus": 1752126.3633125557, "pop_25_less_9th_percentage": 9.669834046081851, "pop_25_hs_grad_percentage": 26.227687226513513, "pop_25_bach_plus_percentage": 13.742822601070584, "Incident_Percentage(%)": 0.06409355075719912}, {"Borough": "MANHATTAN", "Illegal_Pet_Incidents": 359, "pop_25_less_9th": 87347.31473259053, "pop_25_hs_grad": 154754.67435933146, "pop_25_bach_plus": 359791.4083537605, "pop_25_plus": 1235758.1058495822, "pop_25_less_9th_percentage": 7.068318169965744, "pop_25_hs_grad_percentage": 12.523055574289582, "pop_25_bach_plus_percentage": 29.11503526868669, "Incident_Percentage(%)": 0.029050992933053667}, {"Borough": "QUEENS", "Illegal_Pet_Incidents": 1236, "pop_25_less_9th": 169404.0695331715, "pop_25_hs_grad": 445569.1017605178, "pop_25_bach_plus": 196663.5854595469, "pop_25_plus": 1645685.0323624595, "pop_25_less_9th_percentage": 10.293833036202795, "pop_25_hs_grad_percentage": 27.074992662531667, "pop_25_bach_plus_percentage": 11.950256676833655, "Incident_Percentage(%)": 0.07510550170257446}, {"Borough": "STATEN ISLAND", "Illegal_Pet_Incidents": 502, "pop_25_less_9th": 16258.73644621514, "pop_25_hs_grad": 101942.72079083665, "pop_25_bach_plus": 42849.68419521912, "pop_25_plus": 328994.2111553785, "pop_25_less_9th_percentage": 4.941952136214461, "pop_25_hs_grad_percentage": 30.986174629890616, "pop_25_bach_plus_percentage": 13.024449288860565, "Incident_Percentage(%)": 0.1525862714231509}]}}, {"mode": "vega-lite"});
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "axis": {"labelFontSize": 8, "titleFontSize": 10}, "title": {"anchor": "middle", "fontSize": 10}}, "layer": [{"mark": {"type": "point", "filled": true, "size": 100}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_hs_grad_percentage", "title": "% Population with High School Graduation", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_hs_grad_percentage", "scale": {"domain": [11.270750016860624, 34.08479209287968]}, "title": "% Population with High School Graduation", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}}, {"mark": {"type": "line", "color": "red"}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_hs_grad_percentage", "title": "% Population with High School Graduation", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_hs_grad_percentage", "scale": {"domain": [11.270750016860624, 34.08479209287968]}, "title": "% Population with High School Graduation", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}, "transform": [{"on": "pop_25_hs_grad_percentage", "regression": "Incident_Percentage(%)"}]}, {"mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8}, "encoding": {"text": {"field": "Borough", "type": "nominal"}, "x": {"field": "pop_25_hs_grad_percentage", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "type": "quantitative"}}}], "data": {"name": "data-002e6f22a1ae82cf6ff653a0c6fa7ea3"}, "height": 400, "title": "Regression: Illegal Pet Incident Percentage vs. % Population with High School Graduation", "width": 800, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-002e6f22a1ae82cf6ff653a0c6fa7ea3": [{"Borough": "BRONX", "Illegal_Pet_Incidents": 721, "pop_25_less_9th": 127254.37082662967, "pop_25_hs_grad": 252696.97821636614, "pop_25_bach_plus": 63837.08046047157, "pop_25_plus": 909748.841886269, "pop_25_less_9th_percentage": 13.98785741378698, "pop_25_hs_grad_percentage": 27.776564979453607, "pop_25_bach_plus_percentage": 7.017000464448195, "Incident_Percentage(%)": 0.07925264279590419}, {"Borough": "BROOKLYN", "Illegal_Pet_Incidents": 1123, "pop_25_less_9th": 169427.7116099733, "pop_25_hs_grad": 459542.2223829029, "pop_25_bach_plus": 240791.617856634, "pop_25_plus": 1752126.3633125557, "pop_25_less_9th_percentage": 9.669834046081851, "pop_25_hs_grad_percentage": 26.227687226513513, "pop_25_bach_plus_percentage": 13.742822601070584, "Incident_Percentage(%)": 0.06409355075719912}, {"Borough": "MANHATTAN", "Illegal_Pet_Incidents": 359, "pop_25_less_9th": 87347.31473259053, "pop_25_hs_grad": 154754.67435933146, "pop_25_bach_plus": 359791.4083537605, "pop_25_plus": 1235758.1058495822, "pop_25_less_9th_percentage": 7.068318169965744, "pop_25_hs_grad_percentage": 12.523055574289582, "pop_25_bach_plus_percentage": 29.11503526868669, "Incident_Percentage(%)": 0.029050992933053667}, {"Borough": "QUEENS", "Illegal_Pet_Incidents": 1236, "pop_25_less_9th": 169404.0695331715, "pop_25_hs_grad": 445569.1017605178, "pop_25_bach_plus": 196663.5854595469, "pop_25_plus": 1645685.0323624595, "pop_25_less_9th_percentage": 10.293833036202795, "pop_25_hs_grad_percentage": 27.074992662531667, "pop_25_bach_plus_percentage": 11.950256676833655, "Incident_Percentage(%)": 0.07510550170257446}, {"Borough": "STATEN ISLAND", "Illegal_Pet_Incidents": 502, "pop_25_less_9th": 16258.73644621514, "pop_25_hs_grad": 101942.72079083665, "pop_25_bach_plus": 42849.68419521912, "pop_25_plus": 328994.2111553785, "pop_25_less_9th_percentage": 4.941952136214461, "pop_25_hs_grad_percentage": 30.986174629890616, "pop_25_bach_plus_percentage": 13.024449288860565, "Incident_Percentage(%)": 0.1525862714231509}]}}, {"mode": "vega-lite"});
 </script>
 </div>
 <div class="cell-output cell-output-display">
 
 <style>
-  #altair-viz-0caecf8901ed4845ab3300fa5891ff30.vega-embed {
+  #altair-viz-bcef86719d7c4f18929f4ed04dd38045.vega-embed {
     width: 100%;
     display: flex;
   }
 
-  #altair-viz-0caecf8901ed4845ab3300fa5891ff30.vega-embed details,
-  #altair-viz-0caecf8901ed4845ab3300fa5891ff30.vega-embed details summary {
+  #altair-viz-bcef86719d7c4f18929f4ed04dd38045.vega-embed details,
+  #altair-viz-bcef86719d7c4f18929f4ed04dd38045.vega-embed details summary {
     position: relative;
   }
 </style>
-<div id="altair-viz-0caecf8901ed4845ab3300fa5891ff30"></div>
+<div id="altair-viz-bcef86719d7c4f18929f4ed04dd38045"></div>
 <script type="text/javascript">
   var VEGA_DEBUG = (typeof VEGA_DEBUG == "undefined") ? {} : VEGA_DEBUG;
   (function(spec, embedOpt){
     let outputDiv = document.currentScript.previousElementSibling;
-    if (outputDiv.id !== "altair-viz-0caecf8901ed4845ab3300fa5891ff30") {
-      outputDiv = document.getElementById("altair-viz-0caecf8901ed4845ab3300fa5891ff30");
+    if (outputDiv.id !== "altair-viz-bcef86719d7c4f18929f4ed04dd38045") {
+      outputDiv = document.getElementById("altair-viz-bcef86719d7c4f18929f4ed04dd38045");
     }
     const paths = {
       "vega": "https://cdn.jsdelivr.net/npm/vega@5?noext",
@@ -1105,7 +1105,7 @@ omni_normtest is not valid with less than 8 observations; 5 samples were given.
         .catch(showError)
         .then(() => displayChart(vegaEmbed));
     }
-  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "axis": {"labelFontSize": 8, "titleFontSize": 10}, "title": {"anchor": "middle", "fontSize": 10}}, "layer": [{"mark": {"type": "point", "filled": true, "size": 100}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_bach_plus_percentage", "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_bach_plus_percentage", "scale": {"domain": [6.315300418003376, 32.02653879555536]}, "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}}, {"mark": {"type": "line", "color": "red"}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_bach_plus_percentage", "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_bach_plus_percentage", "scale": {"domain": [6.315300418003376, 32.02653879555536]}, "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}, "transform": [{"on": "pop_25_bach_plus_percentage", "regression": "Incident_Percentage(%)"}]}, {"mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8}, "encoding": {"text": {"field": "Borough", "type": "nominal"}, "x": {"field": "pop_25_bach_plus_percentage", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "type": "quantitative"}}}], "data": {"name": "data-002e6f22a1ae82cf6ff653a0c6fa7ea3"}, "height": 400, "title": "Regression: Illegal Pet Incident Percentage vs. % Population with Bachelor's Degree or Higher", "width": 600, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-002e6f22a1ae82cf6ff653a0c6fa7ea3": [{"Borough": "BRONX", "Illegal_Pet_Incidents": 721, "pop_25_less_9th": 127254.37082662967, "pop_25_hs_grad": 252696.97821636614, "pop_25_bach_plus": 63837.08046047157, "pop_25_plus": 909748.841886269, "pop_25_less_9th_percentage": 13.98785741378698, "pop_25_hs_grad_percentage": 27.776564979453607, "pop_25_bach_plus_percentage": 7.017000464448195, "Incident_Percentage(%)": 0.07925264279590419}, {"Borough": "BROOKLYN", "Illegal_Pet_Incidents": 1123, "pop_25_less_9th": 169427.7116099733, "pop_25_hs_grad": 459542.2223829029, "pop_25_bach_plus": 240791.617856634, "pop_25_plus": 1752126.3633125557, "pop_25_less_9th_percentage": 9.669834046081851, "pop_25_hs_grad_percentage": 26.227687226513513, "pop_25_bach_plus_percentage": 13.742822601070584, "Incident_Percentage(%)": 0.06409355075719912}, {"Borough": "MANHATTAN", "Illegal_Pet_Incidents": 359, "pop_25_less_9th": 87347.31473259053, "pop_25_hs_grad": 154754.67435933146, "pop_25_bach_plus": 359791.4083537605, "pop_25_plus": 1235758.1058495822, "pop_25_less_9th_percentage": 7.068318169965744, "pop_25_hs_grad_percentage": 12.523055574289582, "pop_25_bach_plus_percentage": 29.11503526868669, "Incident_Percentage(%)": 0.029050992933053667}, {"Borough": "QUEENS", "Illegal_Pet_Incidents": 1236, "pop_25_less_9th": 169404.0695331715, "pop_25_hs_grad": 445569.1017605178, "pop_25_bach_plus": 196663.5854595469, "pop_25_plus": 1645685.0323624595, "pop_25_less_9th_percentage": 10.293833036202795, "pop_25_hs_grad_percentage": 27.074992662531667, "pop_25_bach_plus_percentage": 11.950256676833655, "Incident_Percentage(%)": 0.07510550170257446}, {"Borough": "STATEN ISLAND", "Illegal_Pet_Incidents": 502, "pop_25_less_9th": 16258.73644621514, "pop_25_hs_grad": 101942.72079083665, "pop_25_bach_plus": 42849.68419521912, "pop_25_plus": 328994.2111553785, "pop_25_less_9th_percentage": 4.941952136214461, "pop_25_hs_grad_percentage": 30.986174629890616, "pop_25_bach_plus_percentage": 13.024449288860565, "Incident_Percentage(%)": 0.1525862714231509}]}}, {"mode": "vega-lite"});
+  })({"config": {"view": {"continuousWidth": 300, "continuousHeight": 300}, "axis": {"labelFontSize": 8, "titleFontSize": 10}, "title": {"anchor": "middle", "fontSize": 10}}, "layer": [{"mark": {"type": "point", "filled": true, "size": 100}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_bach_plus_percentage", "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_bach_plus_percentage", "scale": {"domain": [6.315300418003376, 32.02653879555536]}, "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}}, {"mark": {"type": "line", "color": "red"}, "encoding": {"tooltip": [{"field": "Borough", "type": "nominal"}, {"field": "pop_25_bach_plus_percentage", "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, {"field": "Incident_Percentage(%)", "title": "Incident %", "type": "quantitative"}], "x": {"field": "pop_25_bach_plus_percentage", "scale": {"domain": [6.315300418003376, 32.02653879555536]}, "title": "% Population with Bachelor's Degree or Higher", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "title": "Illegal Pet Incident Percentage (%)", "type": "quantitative"}}, "transform": [{"on": "pop_25_bach_plus_percentage", "regression": "Incident_Percentage(%)"}]}, {"mark": {"type": "text", "align": "left", "dx": 7, "fontSize": 8}, "encoding": {"text": {"field": "Borough", "type": "nominal"}, "x": {"field": "pop_25_bach_plus_percentage", "type": "quantitative"}, "y": {"field": "Incident_Percentage(%)", "type": "quantitative"}}}], "data": {"name": "data-002e6f22a1ae82cf6ff653a0c6fa7ea3"}, "height": 400, "title": "Regression: Illegal Pet Incident Percentage vs. % Population with Bachelor's Degree or Higher", "width": 800, "$schema": "https://vega.github.io/schema/vega-lite/v5.20.1.json", "datasets": {"data-002e6f22a1ae82cf6ff653a0c6fa7ea3": [{"Borough": "BRONX", "Illegal_Pet_Incidents": 721, "pop_25_less_9th": 127254.37082662967, "pop_25_hs_grad": 252696.97821636614, "pop_25_bach_plus": 63837.08046047157, "pop_25_plus": 909748.841886269, "pop_25_less_9th_percentage": 13.98785741378698, "pop_25_hs_grad_percentage": 27.776564979453607, "pop_25_bach_plus_percentage": 7.017000464448195, "Incident_Percentage(%)": 0.07925264279590419}, {"Borough": "BROOKLYN", "Illegal_Pet_Incidents": 1123, "pop_25_less_9th": 169427.7116099733, "pop_25_hs_grad": 459542.2223829029, "pop_25_bach_plus": 240791.617856634, "pop_25_plus": 1752126.3633125557, "pop_25_less_9th_percentage": 9.669834046081851, "pop_25_hs_grad_percentage": 26.227687226513513, "pop_25_bach_plus_percentage": 13.742822601070584, "Incident_Percentage(%)": 0.06409355075719912}, {"Borough": "MANHATTAN", "Illegal_Pet_Incidents": 359, "pop_25_less_9th": 87347.31473259053, "pop_25_hs_grad": 154754.67435933146, "pop_25_bach_plus": 359791.4083537605, "pop_25_plus": 1235758.1058495822, "pop_25_less_9th_percentage": 7.068318169965744, "pop_25_hs_grad_percentage": 12.523055574289582, "pop_25_bach_plus_percentage": 29.11503526868669, "Incident_Percentage(%)": 0.029050992933053667}, {"Borough": "QUEENS", "Illegal_Pet_Incidents": 1236, "pop_25_less_9th": 169404.0695331715, "pop_25_hs_grad": 445569.1017605178, "pop_25_bach_plus": 196663.5854595469, "pop_25_plus": 1645685.0323624595, "pop_25_less_9th_percentage": 10.293833036202795, "pop_25_hs_grad_percentage": 27.074992662531667, "pop_25_bach_plus_percentage": 11.950256676833655, "Incident_Percentage(%)": 0.07510550170257446}, {"Borough": "STATEN ISLAND", "Illegal_Pet_Incidents": 502, "pop_25_less_9th": 16258.73644621514, "pop_25_hs_grad": 101942.72079083665, "pop_25_bach_plus": 42849.68419521912, "pop_25_plus": 328994.2111553785, "pop_25_less_9th_percentage": 4.941952136214461, "pop_25_hs_grad_percentage": 30.986174629890616, "pop_25_bach_plus_percentage": 13.024449288860565, "Incident_Percentage(%)": 0.1525862714231509}]}}, {"mode": "vega-lite"});
 </script>
 </div>
 </div>
@@ -1127,7 +1127,7 @@ omni_normtest is not valid with less than 8 observations; 5 samples were given.
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
 <p>Despite its limitations, this method offers a useful framework for understanding the relationship between educational attainment and illegal pet incidents in NYC. By normalizing data and employing regression analysis, the study provides insights that can inform policy decisions and highlight areas for further research. The visualizations effectively communicate complex data, making it accessible to a wider audience and supporting informed decision-making.</p>
-<div id="3ec34015" class="cell" data-execution_count="16">
+<div id="635b0cf6" class="cell" data-execution_count="16">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Download NYC borough boundaries GeoJSON</span></span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>url <span class="op">=</span> <span class="st">"https://data.cityofnewyork.us/api/geospatial/7t3b-ywvw?method=export&amp;format=GeoJSON"</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>response <span class="op">=</span> requests.get(url)</span>

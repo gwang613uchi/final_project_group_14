@@ -116,7 +116,7 @@ We built shiny-based application to provide insights into illegal pet incidents 
 # Key Findings
 
 1. **Minimal Influence of Education**: Regression analysis revealed weak correlations between education attainment in percentageand illegal pet ownership.
-2. **Borough Variability**: The Bronx exhibited higher-than-predicted incident rates, indicating the need for targeted policy interventions.
+2. **Borough Variability**: Staten Island exhibited higher-than-predicted incident rates, indicating the need for targeted policy interventions.
 3. **Spatial Clusters**: ZIP-level analysis highlighted areas with disproportionately high complaint frequencies.
 
 Results indicated that education levels in percentage had minor influences, with coefficients for all variables being statistically small. It reflects the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education percentage shows a negative coefficient (-0.0466), high school graduation shows a slight negative relationship (-0.0335), and bachelor's degree shows a negative relationship (-0.0400).
