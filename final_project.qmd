@@ -10,6 +10,16 @@ import os
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import altair as alt
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import LatentDirichletAllocation
+from sklearn.cluster import KMeans
+from textblob import TextBlob
+import spacy
 ```
 
 # Import Illegal Pets Data and Education Attainment Data in NYC
@@ -581,3 +591,134 @@ print("Map saved as 'regression_map_with_labels.html'. Open this file to view it
 ```
 
 The choropleth map of regression residuals reveals varying model performance across NYC boroughs, with the Bronx showing higher actual incident rates than predicted (red), Manhattan aligning closely with predictions (light orange), and Queens/Brooklyn showing moderate deviations (orange). These patterns suggest that while our education-based regression model captures some patterns in illegal pet ownership, it may not account for other important factors affecting incident rates, particularly in the Bronx. Limitations of this visualization include potential oversimplification of spatial patterns due to borough-level aggregation, which masks within-borough variations, and the challenge of interpreting residuals without considering the underlying population density or socioeconomic factors beyond education that might influence illegal pet ownership patterns.
+
+```{python}
+from textblob import TextBlob
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pandas as pd
+import altair as alt
+
+def analyze_resolutions_nlp():
+    # Simple preprocessing without NLTK
+    def preprocess_text(text):
+        if pd.isna(text):
+            return ""
+        return str(text).lower()
+    
+    # Add sentiment analysis
+    def get_sentiment(text):
+        if pd.isna(text):
+            return 0
+        blob = TextBlob(str(text))
+        return blob.sentiment.polarity
+    
+    # Create preprocessed text column and sentiment scores
+    merged_df['processed_resolution'] = merged_df['Resolution Description'].apply(preprocess_text)
+    merged_df['sentiment_score'] = merged_df['Resolution Description'].apply(get_sentiment)
+    
+    # Rest of your existing category templates and TF-IDF code...
+    category_templates = {
+        'Warning Issued': 'warning documentation owner landlord violation instruct correct',
+        'Access Denied': 'could not access unable to gain access site inspect property',
+        'No Violations Found': 'no violations found no violations cited inspection conducted',
+        'Violations Found': 'notice of violation violations rules regulations issued',
+        'Referred Other Agency': 'not within jurisdiction referred to another agency',
+        'Under Investigation': 'will review in process investigating inspection',
+        'Invalid Information': 'could not locate incorrect address incomplete information',
+        'Case Closed': 'reviewed and closed request complete'
+    }
+    
+    vectorizer = TfidfVectorizer(lowercase=True, stop_words='english', max_features=1000)
+    template_vectors = vectorizer.fit_transform(category_templates.values())
+    description_vectors = vectorizer.transform(merged_df['processed_resolution'])
+    
+    def get_category(vector):
+        if vector.nnz == 0:
+            return "No Resolution Recorded"
+        similarities = cosine_similarity(vector, template_vectors)
+        best_match_idx = similarities.argmax()
+        if similarities[0][best_match_idx] < 0.1:
+            return "Other Resolution"
+        return list(category_templates.keys())[best_match_idx]
+    
+    # Apply categorization
+    merged_df['resolution_category'] = [get_category(vector) for vector in description_vectors]
+    
+    # Create category statistics
+    category_stats = merged_df['resolution_category'].value_counts()
+    
+    # Calculate average sentiment by category
+    sentiment_by_category = merged_df.groupby('resolution_category')['sentiment_score'].agg(['mean', 'count']).round(3)
+    
+    # Create visualization data
+    chart_data = pd.DataFrame({
+        'Resolution_Type': category_stats.index,
+        'Count': category_stats.values
+    })
+    
+    # Create category distribution chart
+    resolution_chart = alt.Chart(chart_data).mark_bar().encode(
+        x=alt.X('Count:Q', title='Number of Cases'),
+        y=alt.Y('Resolution_Type:N', sort='-x', title='Resolution Type'),
+        tooltip=['Resolution_Type', 'Count']
+    ).properties(
+        title='Distribution of Complaint Resolutions',
+        width=600,
+        height=400
+    )
+    
+    # Create sentiment by category chart
+    sentiment_data = merged_df.groupby('resolution_category')['sentiment_score'].mean().reset_index()
+    sentiment_chart = alt.Chart(sentiment_data).mark_bar().encode(
+        x=alt.X('sentiment_score:Q', title='Average Sentiment Score'),
+        y=alt.Y('resolution_category:N', sort='-x', title='Resolution Type'),
+        color=alt.Color('sentiment_score:Q', 
+                       scale=alt.Scale(scheme='redblue'),
+                       title='Sentiment'),
+        tooltip=['resolution_category', 
+                alt.Tooltip('sentiment_score:Q', format='.3f')]
+    ).properties(
+        title='Average Sentiment by Resolution Type',
+        width=600,
+        height=400
+    )
+    
+    # Print statistics
+    print("\nResolution Statistics:")
+    print(category_stats)
+    print("\nPercentage Distribution:")
+    print((category_stats / len(merged_df) * 100).round(2))
+    print("\nSentiment Analysis by Category:")
+    print(sentiment_by_category)
+    
+    # Return both charts side by side
+    combined_chart = alt.hconcat(resolution_chart, sentiment_chart)
+    return combined_chart, category_stats, sentiment_by_category
+
+# Run the analysis
+combined_chart, stats, sentiment_stats = analyze_resolutions_nlp()
+combined_chart
+```
+
+We applied sentiment analysis to understand the emotional tone in resolution descriptions of illegal pet complaints. Using TextBlob, we scored text from -1 (negative) to +1 (positive), with 0 being neutral, to understand how different outcomes are communicated.
+
+Key Findings:
+
+Most Common Resolution: "Warning Issued" (34% of cases)
+Most Negative Tone: "Access Denied" (-0.192)
+Most Neutral: "Violations Found" (-0.010)
+Overall Trend: Slightly negative to neutral tone across most categories
+
+The analysis reveals that while most communications maintain a professional, slightly negative tone, failed inspection attempts ("Access Denied") are communicated more negatively. This suggests a consistent official communication style with variations based on resolution outcome.
+
+Resolution Distribution Analysis:
+
+Major Categories:
+
+"Warning Issued" leads (1,335 cases, 34%)
+"No Resolution Recorded" second (825 cases, 21%)
+Three categories tie at ~500 cases each (12-14%): "Case Closed," "No Violations Found," "Access Denied"
+
+Key Insight:
+The data shows a preference for issuing warnings over finding violations, though a concerning 21% lack recorded resolutions. Access to inspection sites remains a notable challenge.
