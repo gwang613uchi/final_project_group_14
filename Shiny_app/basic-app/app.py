@@ -14,7 +14,7 @@ print(sys.executable)
 os.makedirs("temp_plots", exist_ok=True)
 
 # Load data
-geojson_path = 'Map_data/nyc-zips.geojson'
+geojson_path = 'data/Map_data/nyc-zips.geojson'
 nyc_zips = gpd.read_file(geojson_path)
 merged_df = pd.read_csv("final_education_illegal_pets.csv")
 
