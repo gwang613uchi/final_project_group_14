@@ -723,6 +723,7 @@ Overall Trend: Slightly negative to neutral tone across most categories
 The analysis reveals that while most communications maintain a professional, slightly negative tone, failed inspection attempts ("Access Denied") are communicated more negatively. This suggests a consistent official communication style with variations based on resolution outcome.
 
 Resolution Distribution Analysis:
+The categorization of resolutions uses TF-IDF (Term Frequency-Inverse Document Frequency) vectorization to convert text descriptions into numerical vectors, then employs cosine similarity to match each description with predefined category templates. This automated approach allows for consistent categorization of varied text descriptions into standardized resolution types.
 
 Major Categories:
 
