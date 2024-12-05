@@ -7,20 +7,20 @@ format:
 
 <style>
 body {
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1.2;
     margin: 1;
     padding: 1; 
 }
 
 h1 {
-    font-size: 14px;
+    font-size: 13px;
     margin-bottom: 5px;
     margin-top: 5px;
 }
 
 h2 {
-    font-size: 14px;
+    font-size: 13px;
     margin-bottom: 3px;
     margin-top: 3px;
 }
@@ -154,4 +154,4 @@ Despite its limitations, this method offers a useful framework for understanding
 
 # Future Directions
 
-Future research can enhance this study by focusing on more detailed, neighborhood-level data to examine localized trends and variations in illegal pet ownership/incidents. Expanding the analysis scope to more socioeconomic factors, such as household income, housing conditions, and cultural influences, cam provide a comrephensive understanding of the issue. Additionally, the development of interactive tools that engage the public and assist policymakers in visualizing data and trends cam support more effective targeted interventions. In addition, future research can pay more attention to the enforcement side to see whether incident were handle properly that can prevent future illegal incidents.
+Future research can enhance this study by focusing on more detailed, neighborhood-level data to examine localized trends and variations in illegal pet ownership/incidents. Expanding the analysis scope to more socioeconomic factors, such as household income, housing conditions, and cultural influences, cam provide a comrephensive understanding of the issue. Additionally, the development of interactive tools that engage the public and assist policymakers in visualizing data cab support more effective targeted interventions. In addition, future research can pay more attention to the enforcement side to see whether incident were handle properly that can prevent future illegal incidents.
