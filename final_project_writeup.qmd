@@ -113,6 +113,13 @@ We built shiny-based application to provide insights into illegal pet incidents 
 
 ---
 
+## NLP Analysis
+We applied sentiment analysis to understand the emotional tone in resolution descriptions of illegal pet complaints. Using TextBlob, we scored text from -1 (negative) to +1 (positive), with 0 being neutral, to understand how different outcomes are communicated. Key findings include "Warning Issued" as most common resolution, and "Access Denied" as the most negative tone. Overall trend is slightly negative to neutral tone across most categories. The analysis reveals that while most communications maintain a professional, slightly negative tone, failed inspection attempts ("Access Denied") are communicated more negatively. This suggests a consistent official communication style with variations based on resolution outcome.
+
+Also, the Resolution distribution analysis shows a preference for issuing warnings (34%) over finding violations, though a concerning 21% lack recorded resolutions. Access to inspection sites remains a notable challenge.
+
+<img src="pictures/NLP.png" style="width: 100%; height: auto;" alt="Combined Graph for Distribution of Complaint Resolution & Sentiment Analysis by Resolution Type">
+
 # Key Findings
 
 1. **Minimal Influence of Education**: Regression analysis revealed weak correlations between education attainment in percentageand illegal pet ownership.
@@ -126,7 +133,11 @@ The graphs appear to show strong negative relationships primarily due to scaling
 
 # Limitations
 
-Due to the limitation of time, we only consider illegal pets incidents and education attainment in NYC. The analysis is limited by the small sample size, with only five boroughs, which reduces the statistical power and makes it difficult to draw definitive conclusions. The use of borough-level aggregation may mask important variations within boroughs, potentially overlooking localized trends. Additionally, while the analysis identifies correlations between education levels percentage and incident rates, it cannot establish causation. In addition, this study focus population above 25 years old (due to the missing data from previous years) which may not be representative enough to demonstrate the relationship between illegal pets ownership adn education attaiment among all groups of people. Finally, there are many factors potentially contributing to illegal pets incidents, which are out of the scope of this project due to time and funding limits. 
+Our analysis faces several key methodological and data constraints. The use of borough-level aggregation masks potential neighborhood-level variations in our final combined dataset, potentially obscuring important local patterns and relationships. This limitation stems from the education data being available only at the borough level, without more detailed location information like zip codes, which restricts our regression analysis's statistical power and makes it difficult to establish robust relationships between variables.
+
+Our regression model, while focusing on educational attainment, doesn't account for other potentially important factors such as income levels, housing types and regulations, cultural factors, local enforcement patterns, and pet-related infrastructure (e.g., veterinary services, pet stores).
+
+Furthermore, this study focuses on population above 25 years old (due to the missing data from previous years) which may not be representative enough to demonstrate the relationship between illegal pet ownership and educational attainment among all age groups.
 
 ---
 

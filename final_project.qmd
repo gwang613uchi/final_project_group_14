@@ -651,14 +651,20 @@ def analyze_resolutions_nlp():
     # Calculate average sentiment by category
     sentiment_by_category = merged_df.groupby('resolution_category')['sentiment_score'].agg(['mean', 'count']).round(3)
     
-    # Create visualization data
-    chart_data = pd.DataFrame({
+    # Create visualization data for both charts
+    category_data = pd.DataFrame({
         'Resolution_Type': category_stats.index,
         'Count': category_stats.values
     })
     
-    # Create category distribution chart
-    resolution_chart = alt.Chart(chart_data).mark_bar().encode(
+    sentiment_data = pd.DataFrame({
+        'Resolution_Type': sentiment_by_category.index,
+        'Sentiment': sentiment_by_category['mean'],
+        'Count': sentiment_by_category['count']
+    })
+    
+    # Distribution chart
+    resolution_chart = alt.Chart(category_data).mark_bar().encode(
         x=alt.X('Count:Q', title='Number of Cases'),
         y=alt.Y('Resolution_Type:N', sort='-x', title='Resolution Type'),
         tooltip=['Resolution_Type', 'Count']
@@ -668,18 +674,22 @@ def analyze_resolutions_nlp():
         height=400
     )
     
-    # Create sentiment by category chart
-    sentiment_data = merged_df.groupby('resolution_category')['sentiment_score'].mean().reset_index()
+    # Sentiment chart
     sentiment_chart = alt.Chart(sentiment_data).mark_bar().encode(
-        x=alt.X('sentiment_score:Q', title='Average Sentiment Score'),
-        y=alt.Y('resolution_category:N', sort='-x', title='Resolution Type'),
-        color=alt.Color('sentiment_score:Q', 
-                       scale=alt.Scale(scheme='redblue'),
+        y=alt.Y('Resolution_Type:N', 
+                sort=alt.EncodingSortField(field='Count', order='descending'),
+                title='Resolution Type'),
+        x=alt.X('Sentiment:Q', title='Average Sentiment Score'),
+        color=alt.Color('Sentiment:Q',
+                       scale=alt.Scale(scheme='redblue', domain=[-0.2, 0.1]),
                        title='Sentiment'),
-        tooltip=['resolution_category', 
-                alt.Tooltip('sentiment_score:Q', format='.3f')]
+        tooltip=[
+            alt.Tooltip('Resolution_Type:N', title='Resolution'),
+            alt.Tooltip('Sentiment:Q', format='.3f', title='Sentiment Score'),
+            alt.Tooltip('Count:Q', title='Number of Cases')
+        ]
     ).properties(
-        title='Average Sentiment by Resolution Type',
+        title='Average Sentiment Score by Resolution Type',
         width=600,
         height=400
     )
@@ -692,7 +702,7 @@ def analyze_resolutions_nlp():
     print("\nSentiment Analysis by Category:")
     print(sentiment_by_category)
     
-    # Return both charts side by side
+    # Combine charts side by side
     combined_chart = alt.hconcat(resolution_chart, sentiment_chart)
     return combined_chart, category_stats, sentiment_by_category
 
