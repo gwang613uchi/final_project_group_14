@@ -2,9 +2,47 @@
 title: "Final Project (Group 14)"
 format: html
 ---
+<style>
+body {
+    font-size: 9px;
+    line-height: 1.2;
+    margin: 1;
+    padding: 1; 
+}
 
-# Import Packages
+h1 {
+    font-size: 13px;
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+h2 {
+    font-size: 13px;
+    margin-bottom: 3px;
+    margin-top: 3px;
+}
+
+p {
+    margin-bottom: 3px;
+}
+
+ul, ol {
+    margin-top: 3px;
+    margin-bottom: 3px;
+    padding-left: 16px;
+}
+
+img {
+    width: 30%; 
+    height: auto; 
+}
+
+</style>
+
 ```{python}
+#| include: false
+#| echo: false
+# Import Packages
 import pandas as pd
 import os
 import geopandas as gpd
@@ -22,8 +60,11 @@ from textblob import TextBlob
 import spacy
 ```
 
-# Import Illegal Pets Data and Education Attainment Data in NYC
+
 ```{python}
+#| include: false
+#| echo: false
+# Import Illegal Pets Data and Education Attainment Data in NYC
 # Illegal Pets Data
 illegal_pets = pd.read_csv("data/Illegal Pets/illegal_animals_kept_as_pets_20241116.csv")
 
@@ -31,8 +72,11 @@ illegal_pets = pd.read_csv("data/Illegal Pets/illegal_animals_kept_as_pets_20241
 education = pd.read_csv("data/Education Attainment/ACSST5Y2010.S1501-Data.csv")
 ```
 
-# Combine all education data from 2010 to 2022
+
 ```{python}
+#| include: false
+#| echo: false
+# Combine all education data from 2010 to 2022
 # Directory where all CSV files are stored
 directory = "data/Education Attainment"
 
@@ -59,9 +103,11 @@ combined_df = pd.concat(dataframes, ignore_index=True)
 sorted_df = combined_df.sort_values(by='GEO_ID', ascending=False)
 ```
 
-# Anayze meanings of variables
-Each year's dataset's variable has different interpretation, so it it critical to firstly select the most relevant variable for futher analysis. In our project, we only select total estimate to simplify our anlysis without considering gender and earning. For example, S1501_C01_015's definition has changed in 2018 from 'percent of bachelor degree or higher' to 'total population of bachelor degreee or higher.' Thus, we have to manually clean these messy variables.
+
 ```{python}
+#| include: false
+#| echo: false
+# Anayze meanings of variables
 # Select the top 13 rows (containing each years variable definition) to analyze vairbales meaning
 top_13_rows = sorted_df.head(13)
 
@@ -75,8 +121,10 @@ top_13_rows_f = top_13_rows.drop(columns=columns_to_drop)
 top_13_rows_f = top_13_rows_f.dropna(axis=1, how='all')
 ```
 
-# Select necessery variables
 ```{python}
+#| include: false
+#| echo: false
+# Select necessery variables
 # Cleaning Education Attainment Data
 # Rename selected columns for better readability
 column_rename_map = {
@@ -124,8 +172,11 @@ columns_to_drop = [
 illegal_pets = illegal_pets.drop(columns=columns_to_drop, errors='ignore')
 ```
 
-# Standardization of County Name
+
 ```{python}
+#| include: false
+#| echo: false
+# Standardization of County Name
 # Exam unqiue values in both dataframes for furthern merging
 print(edu_cleaned['area_name'].unique())
 
@@ -172,15 +223,20 @@ print(illegal_pets['area_name'].unique())
 print(edu_nyc['area_name'].unique())
 ```
 
-# Standardization Time Variable
 ```{python}
+#| include: false
+#| echo: false
+# Standardization Time Variable
 # Format both columns as strings
 illegal_pets['year'] = pd.to_datetime(illegal_pets['Created Date'], errors='coerce').dt.strftime('%Y')
 edu_nyc['year'] = pd.to_datetime(edu_nyc['year'], errors='coerce').dt.strftime('%Y')
 ```
 
-# Merging 
+
 ```{python}
+#| include: false
+#| echo: false
+# Merging 
 # Drop 2023 and 2024 because education data does not includes these years
 illegal_pets = illegal_pets[~illegal_pets['year'].isin(['2023', '2024'])]
 
@@ -192,8 +248,11 @@ print(merged_df.head())
 merged_df.to_csv("final_education_illegal_pets.csv", index=False)
 ```
 
-# Load Map Data, drop NA and convert data type
+
 ```{python}
+#| include: false
+#| echo: false
+# Load Map Data, drop NA and convert data type
 # Load the GeoJSON file
 geojson_path = 'nyc-zips.geojson'
 nyc_zips = gpd.read_file(geojson_path)
@@ -208,10 +267,10 @@ merged_df['Incident Zip'] = merged_df['Incident Zip'].apply(lambda x: str(int(x)
 nyc_zips['postalCode'] = nyc_zips['postalCode'].astype(str)
 ```
 
-Final Project Visualization
-
-# 1. Bar chart: types of illegal pets in NYC
 ```{python}
+#| include: false
+#| echo: false
+# 1. Bar chart: types of illegal pets in NYC
 # 1. Bar chart of types of illegal pets
 chart = alt.Chart(merged_df).mark_bar().encode(
     y=alt.Y('Descriptor:N', 
@@ -236,8 +295,10 @@ chart
 chart.save("pictures/bar_chart_types_of_illegal_pets.png")
 ```
 
-# 2. Pie chart of incidents across boroughs
 ```{python}
+#| include: false
+#| echo: false
+# 2. Pie chart of incidents across boroughs
 # Calculate percentages and create pie chart with labels
 total = len(merged_df)
 df_with_pct = merged_df.assign(
@@ -285,8 +346,11 @@ final_chart
 final_chart.save("pictures/pie_chart_incidents_by_borough.png")
 ```
 
-# 3. Choropleth Map
+
 ```{python}
+#| include: false
+#| echo: false
+# 3. Choropleth Map
 import geopandas as gpd
 import pandas as pd
 import json
@@ -333,8 +397,11 @@ choropleth
 choropleth.save("pictures/choropleth_map_illegal_pets.png")
 ```
 
-# 4. Line Plot: Different education level over time
+
 ```{python}
+#| include: false
+#| echo: false
+# 4. Line Plot: Different education level over time
 import altair as alt
 
 # Prepare the data (keeping the same data preparation steps)
@@ -376,8 +443,10 @@ chart = alt.Chart(education_levels_long).mark_line(point=True).encode(
 chart
 ```
 
-# 5. Bar Plot: Different education level by districts
 ```{python}
+#| include: false
+#| echo: false
+# 5. Bar Plot: Different education level by districts
 import altair as alt
 import pandas as pd
 
@@ -424,9 +493,10 @@ chart = alt.Chart(education_levels_long).mark_bar().encode(
 chart
 ```
 
-# 6. Correlation Analysis
-
 ```{python}
+#| include: false
+#| echo: false
+# 6. Correlation Analysis
 import requests
 import geopandas as gpd
 import pandas as pd
@@ -530,23 +600,9 @@ for feature, label in zip(
     combined_chart.save(f"pictures/regression_plot_{feature}.png")
 ```
 
-# Why Use This Method
-This method normalizes incident counts by population size, allowing fair comparisons across boroughs. Regression analysis helps identify relationships between education levels as percentages and incident rates, while visualization makes these patterns clear.
-
-By normalizing incident counts per 10,000 people, the method ensures fair comparisons across boroughs with different population sizes. Regression analysis quantifies the relationship between education levels and incident rates, providing insights into potential trends. Visualizations, such as scatter plots, make these relationships clear and accessible, helping to identify patterns and inform decision-making.
-
-# Analysis of the Graphs
-The regression coefficients are very small, reflecting the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education shows a negative coefficient (-0.0466), high school graduation shows a slight negative relationship (-0.0335), and bachelor's degree shows a negative relationship (-0.0400).
-
-The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in thousands), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales. These patterns, while statistically subtle, suggest that education levels have a minor influence on illegal pet ownership in NYC, though other factors likely play important roles in these relationships.
-
-# Limitations
-The analysis is limited by the small sample size, with only five boroughs, which reduces the statistical power and makes it difficult to draw definitive conclusions. The use of borough-level aggregation may mask important variations within boroughs, potentially overlooking localized trends.  Additionally, while the analysis identifies correlations between education levels and incident rates, it cannot establish causation. 
-
-# Conclusion
-Despite its limitations, this method offers a useful framework for understanding the relationship between educational attainment and illegal pet incidents in NYC. By normalizing data and employing regression analysis, the study provides insights that can inform policy decisions and highlight areas for further research. The visualizations effectively communicate complex data, making it accessible to a wider audience and supporting informed decision-making.
-
 ```{python}
+#| include: false
+#| echo: false
 # 1. Download NYC borough boundaries GeoJSON
 url = "https://data.cityofnewyork.us/api/geospatial/7t3b-ywvw?method=export&format=GeoJSON"
 response = requests.get(url)
@@ -590,9 +646,9 @@ m.save("regression_map_with_labels.html")
 print("Map saved as 'regression_map_with_labels.html'. Open this file to view it.")
 ```
 
-The choropleth map of regression residuals reveals varying model performance across NYC boroughs, with the Bronx showing higher actual incident rates than predicted (red), Manhattan aligning closely with predictions (light orange), and Queens/Brooklyn showing moderate deviations (orange). These patterns suggest that while our education-based regression model captures some patterns in illegal pet ownership, it may not account for other important factors affecting incident rates, particularly in the Bronx. Limitations of this visualization include potential oversimplification of spatial patterns due to borough-level aggregation, which masks within-borough variations, and the challenge of interpreting residuals without considering the underlying population density or socioeconomic factors beyond education that might influence illegal pet ownership patterns.
-
 ```{python}
+#| include: false
+#| echo: false
 from textblob import TextBlob
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
@@ -711,25 +767,116 @@ combined_chart, stats, sentiment_stats = analyze_resolutions_nlp()
 combined_chart
 ```
 
-We applied sentiment analysis to understand the emotional tone in resolution descriptions of illegal pet complaints. Using TextBlob, we scored text from -1 (negative) to +1 (positive), with 0 being neutral, to understand how different outcomes are communicated.
+- Group Members
+    - Yuxuan Geng, PPHA 30538 4, GitHub: emmaa1123
+    - Kohan Chen, PPHA 30538 4, GitHub: kohaningithub
+    - George Wang, PPHA 30538 4, GitHub: gwang613uchi
 
-Key Findings:
+# Introduction
 
-Most Common Resolution: "Warning Issued" (34% of cases)
-Most Negative Tone: "Access Denied" (-0.192)
-Most Neutral: "Violations Found" (-0.010)
-Overall Trend: Slightly negative to neutral tone across most categories
+Illegal pet ownership in New York City (NYC) is a complex issue influenced by various socioeconomic factors, such as education level. This project explores the relationship between educational attainment and the prevalence of illegal pet ownership across NYC boroughs (Manhattan, Brooklyn, Queens, The Bronx, and Staten Island). By combining data on education levels and illegal pet incidents, we aim to uncover potential patterns and provide insights into potential policy responses.
 
-The analysis reveals that while most communications maintain a professional, slightly negative tone, failed inspection attempts ("Access Denied") are communicated more negatively. This suggests a consistent official communication style with variations based on resolution outcome.
+---
 
-Resolution Distribution Analysis:
-The categorization of resolutions uses TF-IDF (Term Frequency-Inverse Document Frequency) vectorization to convert text descriptions into numerical vectors, then employs cosine similarity to match each description with predefined category templates. This automated approach allows for consistent categorization of varied text descriptions into standardized resolution types.
+# Data Sources and Preparation
 
-Major Categories:
+**Illegal Pets Data:** We used complaint records from NYC Open Data, focusing on incidents involving illegal animals kept as pets. They have multiple variables regarding each incident entry, such as address, ZIP code, animal type, agency name, status of incident, etc. The data was cleaned to remove irrelevant columns and standardized for borough-level analysis. **Education Attainment Data:** Educational attainment data was collected from U.S. Census Bureau. Variables such as populations with less than 9th-grade education, high school graduates, and bachelor’s degrees were selected normalized to accommodate different measurements/definitions across years. For example, from 2010 to 2014, the Census Bureau used percentages to measure people with different levels of education attainment. However, since 2014, the measurement has been changed to the number of people. This inconsistancy will be resolved later in the data cleaning and standardization process.
 
-"Warning Issued" leads (1,335 cases, 34%)
-"No Resolution Recorded" second (825 cases, 21%)
-Three categories tie at ~500 cases each (12-14%): "Case Closed," "No Violations Found," "Access Denied"
+## Data Cleaning and Standardization
+Key preprocessing steps included:
 
-Key Insight:
-The data shows a preference for issuing warnings over finding violations, though a concerning 21% lack recorded resolutions. Access to inspection sites remains a notable challenge.
+1. **Combining Education Data**: Merging annual education datasets (2010–2022) through for loop and reconciling variable definitions for consistency by manually checking each year definition by selecting top 13 rows of the merged dataframe.
+2. **Standardizing Names and Education Attainment**: Mapping borough and county names for alignment across datasets. Transforming all education attainment (population above 25 years old) measurements into numbers of populatin, instead of percentages, by multiplying the population over 25 and the percentage of each year.
+3. **Time Variable Adjustment**: Ensuring time variables matched between datasets for effective merging by transforming illegal pets data time variable to year format because we need to combine it with education data that only has time variable in time.
+4. **Normalizing Inccident Counts Per 10,000 People**: This method normalizes incident counts by population size, allowing fair comparisons across boroughs. For example, Staten Island that has relatively low population may have lower illegal pets iccidents, while Brooklyn with high population may have more incidents. This nature makes it unfair to compared the iccident count directly. Thus, we also normalize incident counts per 10,000 people in each borough. By normalizing incident counts per 10,000 people, the method ensures fair comparisons across boroughs with different population sizes. 
+
+---
+
+# Visualization and Regression Models
+
+We used altair package to build visualizations to make these relationships accessible, helping to identify patterns and inform decision-making. The eventual merged dataset, named "final_education_illegal_pets.csv", provided borough-level insights into illegal pet incidents and corresponding education attainment levels. We also built regression analysis that quantifies the relationship between education levels and incident rates to provide insights into potential trends.
+
+**Bar Chart: Types of Illegal Pets in NYC**  
+A bar chart visualizes the frequency of illegal pet types, revealing that roosters dominate the list of incidents.
+
+**Pie Chart: Borough-Wise Distribution**  
+The pie chart highlights the geographic distribution of incidents, with Brooklyn and Queens leading in complaint counts, reflecting their population density.
+
+**Bar Chart: Education Levels by District**  
+The bar chart displays the average population in NYC boroughs by education level, with less than a 9th-grade education, high school graduates, and those holding a bachelor's degree or higher. Manhatton has the hight number of bachelor degree holder, while Staten Island has the lowest number.
+
+**Line Plot: Education Levels Over Time**  
+The line plot illustrates trends in educational attainment (e.g., high school graduates, bachelor’s degrees) over the study period, providing context for borough-level analysis. Bachelor degree holders have increased in the past decade, while high schoool graduates and people with less than 9th grade have experienced fulctuations.
+
+**Choropleth Map: Spatial Patterns**  
+The choropleth map presents ZIP-level variability in complaints, showing dense clusters in specific urban areas, with darker color indicating higher complaint densities. This visualization emphasizes localized trends in illegal pet incident. 
+
+<br><br><br>
+![](pictures/bar_chart_types_of_illegal_pets.png){width=40%}
+![](pictures/pie_chart_incidents_by_borough.png){width=40%}
+<br><br><br>
+![](pictures/bar_plot_education_levels_by_district.png){width=40%}
+![](pictures/line_plot_education_levels.png){width=40%}
+![](pictures/choropleth_map_illegal_pets.png){width=40%}
+<br><br><br>
+
+## Regression Models
+
+Regression analysis helps identify relationships between education levels as percentages and incident rates. Among each level of education attainment, we performed Ordinary Least Squares regression, using all education levels (as percentages) as predictors. Different cities were labeled in the graph as well to represent their unqiue education level and illegal pet incident rate. The overall model was represented by the red line in each graph to show a general trend between each education level in percentage and illegal pet incident.
+
+![Regression Plot: Population with Less than 9th Grade](pictures/regression_plot_pop_25_less_9th_percentage.png)
+![Regression Plot: High School Graduates](pictures/regression_plot_pop_25_hs_grad_percentage.png)
+![Regression Plot: Bachelor’s Degree or Higher](pictures/regression_plot_pop_25_bach_plus_percentage.png)
+
+## Shiny App
+
+::: {.clearfix}
+![](pictures/shiny_app_display.png){style="float: right; margin: 0 0 10px 10px; width: 50%;"}
+
+We built shiny-based application to provide insights into illegal pet incidents in New York City by offering three key visualizations: a choropleth map highlighting incident density across ZIP codes, a line chart of education levels over time, and a correlation plot examining the relationship between education attainment and incident rates. Through switching toggle and checkbox, users can interactively filter data by selecting specific years, year ranges, or education levels, allowing users to observe the spatial and socioeconomic factors influencing illegal pet incidents.
+:::
+
+---
+
+## NLP Analysis
+We applied sentiment analysis to understand the emotional tone in resolution descriptions of illegal pet complaints. Using TextBlob, we scored text from -1 (negative) to +1 (positive), with 0 being neutral, to understand how different outcomes are communicated. Key findings include "Warning Issued" as most common resolution, and "Access Denied" as the most negative tone. Overall trend is slightly negative to neutral tone across most categories. The analysis reveals that while most communications maintain a professional, slightly negative tone, failed inspection attempts ("Access Denied") are communicated more negatively. This suggests a consistent official communication style with variations based on resolution outcome.
+
+Also, for the Resolution distribution analysis, text descriptions are **converted to numerical vectors using TF-IDF**, then matched to categories using cosine similarity, enabling automated and consistent classification of resolution types.
+It shows a preference for issuing warnings (34%) over finding violations, though a concerning 21% lack recorded resolutions. Access to inspection sites remains a notable challenge.
+
+<img src="pictures/NLP.png" style="width: 100%; height: auto;" alt="Combined Graph for Distribution of Complaint Resolution & Sentiment Analysis by Resolution Type">
+
+# Key Findings
+
+1. **Minimal Influence of Education**: Regression analysis revealed weak correlations between education attainment in percentageand illegal pet ownership.
+2. **Borough Variability**: Staten Island exhibited higher-than-predicted incident rates, indicating the need for targeted policy interventions.
+3. **Spatial Clusters**: ZIP-level analysis highlighted areas with disproportionately high complaint frequencies.
+
+Results indicated that education levels in percentage had minor influences, with coefficients for all variables being statistically small. It reflects the rare nature of illegal pet ownership (0.2% to 1.0% of population). Less than 9th-grade education percentage shows a negative coefficient (-0.0466), high school graduation shows a slight negative relationship (-0.0335), and bachelor's degree shows a negative relationship (-0.0400).
+
+The graphs appear to show strong negative relationships primarily due to scaling effects. While the x-axis spans a large range (showing education levels in percentage), the y-axis variation is minimal (0.2% to 1.0% incident rate). This disparity in scales makes even small changes appear more dramatic visually. For instance, the positive coefficient for high school graduation (3.576e-06) appears negative in the graph because the effect is so small relative to the axis scales. These patterns, while statistically subtle, suggest that education levels percentage have a minor influence on illegal pet ownership in NYC, though other factors likely play important roles in these relationships.
+---
+
+# Limitations
+
+Our analysis faces several key methodological and data constraints. The use of borough-level aggregation masks potential neighborhood-level variations in our final combined dataset, potentially obscuring important local patterns and relationships. This limitation stems from the education data being available only at the borough level, without more detailed location information like zip codes, which restricts our regression analysis's statistical power and makes it difficult to establish robust relationships between variables.
+
+Our regression model, while focusing on educational attainment, doesn't account for other potentially important factors such as income levels, housing types and regulations, cultural factors, local enforcement patterns, and pet-related infrastructure (e.g., veterinary services, pet stores).
+
+Furthermore, this study focuses on population above 25 years old (due to the missing data from previous years) which may not be representative enough to demonstrate the relationship between illegal pet ownership and educational attainment among all age groups.
+
+---
+
+# Policy Implications
+
+1. **Community Outreach**: Educational campaigns targeting high-incident areas, highlighted in the choroplether path.
+2. **Enhanced Enforcement**: Strengthening monitoring and reporting mechanisms in areas with dense complaint clusters.
+3. **Broader Socioeconomic Analysis**: Exploring additional factors such as income levels, housing conditions, and cultural influences.
+
+Despite its limitations, this method offers a useful framework for understanding the relationship between educational attainment percentage and illegal pet incidents in NYC. By normalizing data and employing regression analysis, the study provides insights that can inform policy decisions and highlight areas for further research. The visualizations effectively communicate complex data, making it accessible to a wider audience and supporting informed decision-making.
+
+---
+
+# Future Directions
+
+Future research can enhance this study by focusing on more detailed, neighborhood-level data to examine localized trends and variations in illegal pet ownership/incidents. Expanding the analysis scope to more socioeconomic factors, such as household income, housing conditions, and cultural influences, cam provide a comprehensive understanding of the issue. Additionally, the development of interactive tools that engage the public and assist policymakers in visualizing data can support more effective targeted interventions. In addition, future research can pay more attention to the enforcement side to see whether incident were handle properly that can prevent future illegal incidents.
